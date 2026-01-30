@@ -123,7 +123,7 @@ func runInit(_ *cobra.Command, _ []string, installSkillsFlag bool, forceFlag boo
 		fmt.Println("3. Get your GitHub token from: https://github.com/settings/tokens")
 		fmt.Println("4. Run 'vibe <ticket-id>' to start working on a ticket")
 		fmt.Println()
-		cyan.Println("Tip: Create a .vibe.yaml file in your project to override settings")
+		_, _ = cyan.Println("Tip: Create a .vibe.yaml file in your project to override settings")
 		fmt.Println("     Run 'vibe init --local' to generate an example override file")
 	}
 

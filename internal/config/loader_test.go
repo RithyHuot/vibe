@@ -12,7 +12,7 @@ func TestLoadWithLocalOverride(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// Create a global config file
 	globalConfigPath := filepath.Join(tmpDir, "global-config.yaml")
@@ -79,7 +79,7 @@ ai:
 	if err != nil {
 		t.Fatalf("Failed to get current dir: %v", err)
 	}
-	defer os.Chdir(originalDir)
+	defer func() { _ = os.Chdir(originalDir) }()
 
 	if err := os.Chdir(localDir); err != nil {
 		t.Fatalf("Failed to change to local dir: %v", err)
@@ -132,7 +132,7 @@ func TestLoadWithoutLocalOverride(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// Create a global config file
 	globalConfigPath := filepath.Join(tmpDir, "global-config.yaml")
@@ -183,7 +183,7 @@ ui:
 	if err != nil {
 		t.Fatalf("Failed to get current dir: %v", err)
 	}
-	defer os.Chdir(originalDir)
+	defer func() { _ = os.Chdir(originalDir) }()
 
 	if err := os.Chdir(emptyDir); err != nil {
 		t.Fatalf("Failed to change to empty dir: %v", err)
@@ -219,7 +219,7 @@ func TestFindLocalConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	localConfigPath := filepath.Join(tmpDir, ".vibe.yaml")
 	if err := os.WriteFile(localConfigPath, []byte("test: true"), 0600); err != nil {
@@ -230,7 +230,7 @@ func TestFindLocalConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get current dir: %v", err)
 	}
-	defer os.Chdir(originalDir)
+	defer func() { _ = os.Chdir(originalDir) }()
 
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change dir: %v", err)
