@@ -202,6 +202,192 @@ Claude:
 
 ---
 
+### 9. vibe-issues
+
+**Purpose**: List and browse GitHub issues
+
+**When to use**: User wants to see available issues
+
+**What it does**:
+
+- Lists open issues with filtering options
+- Interactive selection mode
+- Displays issue metadata
+
+**Example usage**:
+
+```
+User: "Show me open issues"
+Claude: Runs `vibe issues` and shows the list
+```
+
+---
+
+### 10. vibe-issue
+
+**Purpose**: View GitHub issue details
+
+**When to use**: User wants to see specific issue information
+
+**What it does**:
+
+- Shows issue title, description, and metadata
+- Displays comments if requested
+- Offers branch creation option
+
+**Example usage**:
+
+```
+User: "Show me issue #123"
+Claude: Runs `vibe issue 123 --comments` and displays details
+```
+
+---
+
+### 11. vibe-issue-create
+
+**Purpose**: Create a new GitHub issue
+
+**When to use**: User wants to create an issue
+
+**What it does**:
+
+- Prompts for title and description
+- Supports labels, assignees, and milestones
+- Uses issue templates if available
+
+**Example usage**:
+
+```
+User: "Create an issue for the login bug"
+Claude:
+1. Gathers information
+2. Creates issue with proper metadata
+3. Shows issue URL
+```
+
+---
+
+### 12. vibe-issue-update
+
+**Purpose**: Update an existing GitHub issue
+
+**When to use**: User wants to modify issue metadata or state
+
+**What it does**:
+
+- Updates title, description, or state
+- Modifies labels, assignees, milestone
+- Can close or reopen issues
+
+**Example usage**:
+
+```
+User: "Close issue #123"
+Claude: Runs `vibe issue-update 123 --state closed`
+```
+
+---
+
+### 13. vibe-code-review
+
+**Purpose**: Perform comprehensive code review
+
+**When to use**: Before creating PRs or when user requests a review
+
+**What it does**:
+
+- Analyzes code changes for bugs, security issues, and performance problems
+- Checks best practices and code quality
+- Provides structured feedback with severity levels
+- Suggests specific improvements
+
+**Example usage**:
+
+```
+User: "Review my code before I create a PR"
+Claude:
+1. Gets git diff
+2. Reads changed files for context
+3. Performs systematic review:
+   - Security vulnerabilities
+   - Bug detection
+   - Performance issues
+   - Code quality
+   - Best practices
+   - Testing coverage
+4. Provides categorized feedback:
+   - 🔴 Critical issues (must fix)
+   - 🟡 Important issues (should fix)
+   - 🔵 Suggestions (nice to have)
+```
+
+---
+
+### 14. vibe-dependabot-review
+
+**Purpose**: Review Dependabot PRs for breaking changes and create fixes
+
+**When to use**:
+
+- Dependabot creates a PR for dependency updates
+- User wants to safely merge dependency updates
+- CI is failing after dependency update
+
+**What it does**:
+
+- Identifies Dependabot PRs automatically
+- Analyzes dependency version changes
+- Assesses breaking change risk (HIGH/MEDIUM/LOW)
+- Fetches release notes and changelogs
+- Searches codebase for affected code
+- Creates a fix branch from Dependabot PR
+- Implements necessary fixes for breaking changes
+- Runs tests to verify fixes
+- Creates a draft PR with all fixes
+
+**Risk Assessment Levels**:
+
+- **🔴 HIGH RISK**: Major version bumps (v1.x → v2.x)
+  - Reads full changelog
+  - Identifies breaking changes
+  - Creates comprehensive fixes
+
+- **🟡 MEDIUM RISK**: Minor version or multiple patches
+  - Checks for behavior changes
+  - Runs tests on Dependabot branch
+  - Creates fixes if tests fail
+
+- **🟢 LOW RISK**: Single patch version
+  - Quick validation
+  - Reports safe to merge if tests pass
+
+**Example usage**:
+
+```
+User: "Review dependabot PR #456"
+Claude:
+1. Identifies PR as Dependabot update
+2. Analyzes: cobra v1.8.0 → v2.0.0 (MAJOR version)
+3. Fetches release notes from GitHub
+4. Finds breaking change: "Command.Run signature changed"
+5. Searches codebase for affected files
+6. Creates fix branch: fix/dependabot-cobra-v2
+7. Updates all Command.Run to Command.RunE
+8. Runs tests: go test ./...
+9. Creates draft PR with fixes
+10. Reports:
+    - Breaking changes found
+    - Files modified
+    - Test results
+    - Draft PR URL
+    - Merge order instructions
+```
+
+**Important**: The fix PR should be merged BEFORE the Dependabot PR.
+
+---
+
 ## Skill Configuration
 
 Each skill is defined by a `SKILL.md` file in the `skills/<skill-name>/` directory. The file includes:

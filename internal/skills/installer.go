@@ -134,6 +134,7 @@ func PrintInstallSuccess() {
 	fmt.Println()
 	_, _ = yellow.Println("Available skills:")
 	fmt.Println("  - vibe                    Start work on a ClickUp ticket")
+	fmt.Println("  - vibe-dependabot-review  Review Dependabot PRs for breaking changes and create a draft PR with fixes")
 	fmt.Println("  - vibe-ticket             Get context on current ticket")
 	fmt.Println("  - vibe-comment            Add comment to ticket")
 	fmt.Println("  - vibe-pr                 Create a pull request")

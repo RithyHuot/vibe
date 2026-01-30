@@ -270,6 +270,7 @@ This removes all vibe skills from `~/.claude/skills/`. You can reinstall them an
 | `vibe-issue-create` | Create a new issue | "create an issue" |
 | `vibe-issue-update` | Update existing issue | "close issue #123" |
 | `vibe-code-review` | Perform comprehensive code review | "review my code" |
+| `vibe-dependabot-review` | Review Dependabot PRs and create fixes | "review dependabot PR 123" |
 
 ### Using Skills with Claude Code
 
@@ -1289,7 +1290,8 @@ vibe/
 │   ├── vibe-issue/
 │   ├── vibe-issue-create/
 │   ├── vibe-issue-update/
-│   └── vibe-code-review/
+│   ├── vibe-code-review/
+│   └── vibe-dependabot-review/
 ├── Makefile
 └── README.md
 ```
