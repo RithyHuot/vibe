@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  vibe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vibe:local
+    container_name: vibe
+    volumes:
+      # Mount config directory
+      - ~/.config/vibe:/home/vibe/.config/vibe:ro
+      # Mount git config for authentication
+      - ~/.gitconfig:/home/vibe/.gitconfig:ro
+      - ~/.ssh:/home/vibe/.ssh:ro
+      # Mount working directory
+      - .:/workspace:rw
+    working_dir: /workspace
+    environment:
+      # Override config with environment variables if needed
+      - VIBE_CLICKUP_TOKEN=${VIBE_CLICKUP_TOKEN}
+      - VIBE_GITHUB_TOKEN=${VIBE_GITHUB_TOKEN}
+      - VIBE_CIRCLECI_TOKEN=${VIBE_CIRCLECI_TOKEN}
+      - VIBE_CLAUDE_API_KEY=${VIBE_CLAUDE_API_KEY}
+      - VIBE_DEBUG=${VIBE_DEBUG:-false}
+    command: --help
+
+  # Development service with hot reload (requires air or similar)
+  vibe-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: vibe:dev
+    container_name: vibe-dev
+    volumes:
+      - .:/build:rw
+      - go-mod-cache:/go/pkg/mod
+    working_dir: /build
+    command: go run ./cmd/vibe/main.go --help
+    environment:
+      - VIBE_DEBUG=true
+
+volumes:
+  go-mod-cache:

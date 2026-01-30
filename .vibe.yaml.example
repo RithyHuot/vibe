@@ -1,0 +1,42 @@
+# Local Vibe Configuration Override (.vibe.yaml)
+#
+# This file overrides settings from ~/.config/vibe/config.yaml for this project only.
+# You only need to include the fields you want to override - not the entire config.
+#
+# Priority order:
+#   CLI flags > Local .vibe.yaml > Global config > Environment variables > Defaults
+#
+# Common use cases:
+#
+# 1. Override GitHub repo for this project:
+github:
+  owner: "different-org"
+  repo: "different-repo"
+
+# 2. Override git branch prefix:
+git:
+  branch_prefix: "feature"
+
+# 3. Use CLI mode for GitHub in this project:
+# github:
+#   mode: "cli"
+
+# 4. Override workspace for this project:
+# workspaces:
+#   - name: "Engineering"
+#     folder_id: "123456789"
+#     sprint_patterns:
+#       - "Sprint \\d+ \\("
+
+# 5. Override defaults:
+# defaults:
+#   status: "Ready for Review"
+
+# 6. Disable AI features for this project:
+# ai:
+#   enabled: false
+#   generate_descriptions: false
+
+# 7. Override UI settings:
+# ui:
+#   color_enabled: false

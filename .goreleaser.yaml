@@ -1,0 +1,180 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: vibe
+    main: ./cmd/vibe
+    binary: vibe
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "6"
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.BuildTime={{.Date}}
+      - -X main.Commit={{.Commit}}
+
+archives:
+  - id: vibe
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - CONTRIBUTING.md
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - 'typo'
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug Fixes
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Performance Improvements
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Refactors
+      regexp: '^.*?refactor(\([[:word:]]+\))??!?:.+$'
+      order: 3
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: rithyhuot
+    name: vibe
+  draft: false
+  prerelease: auto
+  mode: replace
+  name_template: "v{{.Version}}"
+  header: |
+    ## vibe v{{.Version}}
+
+    A production-quality CLI tool that streamlines developer workflow by integrating ClickUp, GitHub, and CircleCI.
+
+    ### Installation
+
+    **macOS (Homebrew):**
+    ```bash
+    brew tap rithyhuot/vibe
+    brew install vibe
+    ```
+
+    **Binary Download:**
+    Download the appropriate binary for your platform from the assets below.
+
+    **Go Install:**
+    ```bash
+    go install github.com/rithyhuot/vibe/cmd/vibe@latest
+    ```
+
+  footer: |
+    ## What's Next?
+
+    Check out the [full documentation](https://github.com/rithyhuot/vibe#readme) for setup instructions and usage examples.
+
+    **Feedback?** Open an issue on [GitHub](https://github.com/rithyhuot/vibe/issues).
+
+brews:
+  - name: vibe
+    repository:
+      owner: rithyhuot
+      name: homebrew-vibe
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    directory: Formula
+    homepage: "https://github.com/rithyhuot/vibe"
+    description: "CLI tool for streamlining developer workflow with ClickUp, GitHub, and CircleCI"
+    license: "MIT"
+    test: |
+      system "#{bin}/vibe --version"
+    install: |
+      bin.install "vibe"
+
+dockers:
+  - image_templates:
+      - "ghcr.io/rithyhuot/vibe:{{ .Version }}-amd64"
+      - "ghcr.io/rithyhuot/vibe:latest-amd64"
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    dockerfile: Dockerfile
+
+  - image_templates:
+      - "ghcr.io/rithyhuot/vibe:{{ .Version }}-arm64"
+      - "ghcr.io/rithyhuot/vibe:latest-arm64"
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    dockerfile: Dockerfile
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/rithyhuot/vibe:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/rithyhuot/vibe:{{ .Version }}-amd64"
+      - "ghcr.io/rithyhuot/vibe:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/rithyhuot/vibe:latest"
+    image_templates:
+      - "ghcr.io/rithyhuot/vibe:latest-amd64"
+      - "ghcr.io/rithyhuot/vibe:latest-arm64"
+
+announce:
+  skip: true
