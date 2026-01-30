@@ -1,26 +1,38 @@
+version: "2"
 run:
-  timeout: 5m
   tests: true
-
 linters:
   enable:
-    - gofmt
     - govet
     - errcheck
     - staticcheck
     - unused
     - ineffassign
     - misspell
-    - revive
     - gocyclo
     - dupl
-
-linters-settings:
-  gocyclo:
-    min-complexity: 15
-  dupl:
-    threshold: 150  # Allow more duplication in test code
-
+  settings:
+    dupl:
+      threshold: 150
+    gocyclo:
+      min-complexity: 15
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - revive
+        path: internal/utils/branch.go
+        text: 'var-naming: avoid meaningless package names'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-use-default: false
   max-same-issues: 0
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

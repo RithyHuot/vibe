@@ -709,9 +709,10 @@ func (c *CLIClient) UpdateIssue(ctx context.Context, issueNumber int, req *model
 	// Handle state changes separately (close/reopen)
 	if req.State != nil {
 		stateArgs := []string{"issue"}
-		if *req.State == "closed" {
+		switch *req.State {
+		case "closed":
 			stateArgs = append(stateArgs, "close", strconv.Itoa(issueNumber))
-		} else if *req.State == "open" {
+		case "open":
 			stateArgs = append(stateArgs, "reopen", strconv.Itoa(issueNumber))
 		}
 
