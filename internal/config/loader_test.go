@@ -6,6 +6,38 @@ import (
 	"testing"
 )
 
+func verifyLocalOverrides(t *testing.T, cfg *Config) {
+	t.Helper()
+	if cfg.GitHub.Owner != "local-org" {
+		t.Errorf("Expected GitHub owner to be 'local-org' (from local), got '%s'", cfg.GitHub.Owner)
+	}
+	if cfg.GitHub.Repo != "local-repo" {
+		t.Errorf("Expected GitHub repo to be 'local-repo' (from local), got '%s'", cfg.GitHub.Repo)
+	}
+	if cfg.Git.BranchPrefix != "local-prefix" {
+		t.Errorf("Expected git branch prefix to be 'local-prefix' (from local), got '%s'", cfg.Git.BranchPrefix)
+	}
+	if cfg.AI.Enabled != false {
+		t.Errorf("Expected AI enabled to be false (from local), got %v", cfg.AI.Enabled)
+	}
+}
+
+func verifyGlobalDefaults(t *testing.T, cfg *Config) {
+	t.Helper()
+	if cfg.GitHub.Username != "global-user" {
+		t.Errorf("Expected GitHub username to be 'global-user' (from global), got '%s'", cfg.GitHub.Username)
+	}
+	if cfg.ClickUp.APIToken != "global_token" {
+		t.Errorf("Expected ClickUp token to be 'global_token' (from global), got '%s'", cfg.ClickUp.APIToken)
+	}
+	if cfg.Git.BaseBranch != "main" {
+		t.Errorf("Expected git base branch to be 'main' (from global), got '%s'", cfg.Git.BaseBranch)
+	}
+	if cfg.UI.ColorEnabled != true {
+		t.Errorf("Expected UI color enabled to be true (from global), got %v", cfg.UI.ColorEnabled)
+	}
+}
+
 func TestLoadWithLocalOverride(t *testing.T) {
 	// Create a temporary directory for testing
 	tmpDir, err := os.MkdirTemp("", "vibe-config-test-*")
@@ -92,38 +124,10 @@ ai:
 	}
 
 	// Verify that local overrides took effect
-	if cfg.GitHub.Owner != "local-org" {
-		t.Errorf("Expected GitHub owner to be 'local-org' (from local), got '%s'", cfg.GitHub.Owner)
-	}
-
-	if cfg.GitHub.Repo != "local-repo" {
-		t.Errorf("Expected GitHub repo to be 'local-repo' (from local), got '%s'", cfg.GitHub.Repo)
-	}
-
-	if cfg.Git.BranchPrefix != "local-prefix" {
-		t.Errorf("Expected git branch prefix to be 'local-prefix' (from local), got '%s'", cfg.Git.BranchPrefix)
-	}
-
-	if cfg.AI.Enabled != false {
-		t.Errorf("Expected AI enabled to be false (from local), got %v", cfg.AI.Enabled)
-	}
+	verifyLocalOverrides(t, cfg)
 
 	// Verify that non-overridden values remain from global config
-	if cfg.GitHub.Username != "global-user" {
-		t.Errorf("Expected GitHub username to be 'global-user' (from global), got '%s'", cfg.GitHub.Username)
-	}
-
-	if cfg.ClickUp.APIToken != "global_token" {
-		t.Errorf("Expected ClickUp token to be 'global_token' (from global), got '%s'", cfg.ClickUp.APIToken)
-	}
-
-	if cfg.Git.BaseBranch != "main" {
-		t.Errorf("Expected git base branch to be 'main' (from global), got '%s'", cfg.Git.BaseBranch)
-	}
-
-	if cfg.UI.ColorEnabled != true {
-		t.Errorf("Expected UI color enabled to be true (from global), got %v", cfg.UI.ColorEnabled)
-	}
+	verifyGlobalDefaults(t, cfg)
 }
 
 func TestLoadWithoutLocalOverride(t *testing.T) {
