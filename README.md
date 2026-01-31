@@ -102,7 +102,7 @@ vibe merge
 - `vibe issues` - Browse GitHub issues
 - `vibe start` - Interactive ticket selection
 
-See the full [Usage Guide](#usage) below for detailed examples and options.
+See the full [Usage Guide](#commands) below for detailed examples and options.
 
 ## Installation
 
