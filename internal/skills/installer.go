@@ -106,6 +106,9 @@ func Uninstall() error {
 		"vibe-issue-create",
 		"vibe-issue-update",
 		"vibe-code-review",
+		"vibe-dependabot-review",
+		"add-claude-skill",
+		"add-command-skill",
 	}
 
 	// Remove each skill directory
@@ -133,20 +136,32 @@ func PrintInstallSuccess() {
 	_, _ = cyan.Printf("Location: %s\n", skillsPath)
 	fmt.Println()
 	_, _ = yellow.Println("Available skills:")
+	fmt.Println()
+	fmt.Println("Core Workflow:")
 	fmt.Println("  - vibe                    Start work on a ClickUp ticket")
-	fmt.Println("  - vibe-dependabot-review  Review Dependabot PRs for breaking changes and create a draft PR with fixes")
 	fmt.Println("  - vibe-ticket             Get context on current ticket")
 	fmt.Println("  - vibe-comment            Add comment to ticket")
+	fmt.Println()
+	fmt.Println("Pull Requests:")
 	fmt.Println("  - vibe-pr                 Create a pull request")
 	fmt.Println("  - vibe-pr-status          Check PR status")
 	fmt.Println("  - vibe-pr-update          Update PR description")
 	fmt.Println("  - vibe-merge              Merge a pull request")
-	fmt.Println("  - vibe-ci-status          Check CircleCI status")
+	fmt.Println("  - vibe-dependabot-review  Review Dependabot PRs for breaking changes and create fixes")
+	fmt.Println()
+	fmt.Println("Issues:")
 	fmt.Println("  - vibe-issues             List GitHub issues")
 	fmt.Println("  - vibe-issue              View issue details")
 	fmt.Println("  - vibe-issue-create       Create a new issue")
 	fmt.Println("  - vibe-issue-update       Update existing issue")
+	fmt.Println()
+	fmt.Println("Development:")
+	fmt.Println("  - vibe-ci-status          Check CircleCI status")
 	fmt.Println("  - vibe-code-review        Perform comprehensive code review")
+	fmt.Println()
+	fmt.Println("Helper Skills:")
+	fmt.Println("  - add-claude-skill        Add a new Claude Code skill for vibe CLI")
+	fmt.Println("  - add-command-skill       Add a new vibe command with associated skill")
 	fmt.Println()
 	fmt.Println("These skills are now available in ALL your projects when using Claude Code!")
 }

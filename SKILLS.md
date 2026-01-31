@@ -6,6 +6,10 @@ This document describes the Claude Code skills available for the vibe CLI. These
 
 Claude Code skills are AI-powered integrations that allow Claude Code to interact with your development tools. Each skill defines how Claude should use a specific vibe CLI command, including when to use it and what context to provide.
 
+## Maintaining This Document
+
+**Important**: When adding new skills, maintain sequential numbering. If inserting a skill in the middle, renumber all subsequent skills to maintain the sequence. Use the helper skills (`add-claude-skill` and `add-command-skill`) which handle this automatically.
+
 ## Available Skills
 
 ### 1. vibe
@@ -385,6 +389,104 @@ Claude:
 ```
 
 **Important**: The fix PR should be merged BEFORE the Dependabot PR.
+
+---
+
+### 15. add-claude-skill
+
+**Purpose**: Add a new Claude Code skill for vibe CLI
+
+**When to use**:
+
+- Adding a skill that wraps existing vibe commands
+- Creating workflow automation that combines multiple commands
+- Building skills that add AI logic on top of CLI commands
+
+**What it does**:
+
+- Guides through gathering skill requirements
+- Creates the skill directory and SKILL.md file
+- Updates README.md with the new skill entry
+- Updates SKILLS.md with detailed documentation
+- Updates internal/skills/installer.go for skill installation
+- Provides a checklist to ensure all files are updated
+- Helps with building, testing, and verifying the skill
+
+**Example usage**:
+
+```
+User: "Add a skill for checking deployment readiness"
+Claude:
+1. Asks clarifying questions:
+   - What is the skill name?
+   - What workflow does it automate?
+   - When should it be invoked?
+   - Which vibe commands will it use?
+2. Creates skills/vibe-deployment-check/SKILL.md
+3. Updates README.md (Available Skills table)
+4. Updates SKILLS.md (adds new skill section)
+5. Updates internal/skills/installer.go
+6. Runs: make build install
+7. Installs: vibe skills
+8. Verifies: ls ~/.claude/skills/vibe-deployment-check
+9. Reports completion with usage examples
+```
+
+**Decision Points**:
+
+- Skill type: Workflow, Analysis, or Decision skill
+- Required tools: Bash(vibe:*), Read, Grep, etc.
+- Trigger conditions: When should Claude invoke this skill?
+
+---
+
+### 16. add-command-skill
+
+**Purpose**: Add a new vibe command with associated Claude Code skill
+
+**When to use**:
+
+- Adding a new command to the vibe CLI
+- Building features that require both a CLI command and Claude integration
+- Extending vibe with new functionality
+
+**What it does**:
+
+- Guides through gathering command requirements
+- Creates the Go command file in internal/commands/
+- Registers the command in cmd/vibe/main.go
+- Creates the associated Claude Code skill
+- Updates all documentation (README.md, SKILLS.md)
+- Updates internal/skills/installer.go for skill installation
+- Runs build, test, and lint checks
+- Provides verification steps
+
+**Example usage**:
+
+```
+User: "Add a command to deploy the application"
+Claude:
+1. Asks clarifying questions:
+   - What arguments/flags does it need?
+   - What should the output be?
+   - When should the skill be invoked?
+2. Creates internal/commands/deploy.go
+3. Registers in cmd/vibe/main.go
+4. Creates skills/vibe-deploy/SKILL.md
+5. Updates README.md (features, commands, skills)
+6. Updates SKILLS.md (adds skill section)
+7. Updates internal/skills/installer.go
+8. Runs: make build test lint
+9. Installs: vibe skills
+10. Reports completion with test commands
+```
+
+**Decision Points**:
+
+- Command arguments and flags
+- GitHub mode support (API vs CLI)
+- Interactive vs non-interactive mode
+- Error handling strategy
 
 ---
 

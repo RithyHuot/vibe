@@ -190,14 +190,41 @@ For detailed architecture documentation including design patterns, data flow, an
 
 ### Adding or Modifying Skills
 
-The `skills/` directory contains Claude Code skill definitions that are embedded into the binary at build time:
+The `skills/` directory contains Claude Code skill definitions that are embedded into the binary at build time.
+
+#### Using Helper Skills (Recommended)
+
+For adding new skills or commands, use the built-in helper skills with Claude Code:
+
+- **`add-claude-skill`**: Automates adding a new Claude Code skill that wraps existing vibe commands
+  - Creates skill directory and SKILL.md
+  - Updates README.md, SKILLS.md, and internal/skills/installer.go
+  - Provides checklist and verification steps
+  - Example: "Add a skill for checking deployment readiness"
+
+- **`add-command-skill`**: Automates adding a new vibe command with its associated skill
+  - Creates Go command file and registers it
+  - Creates associated Claude Code skill
+  - Updates all documentation
+  - Runs build, test, and lint checks
+  - Example: "Add a command for status checking"
+
+These skills guide you through the entire process and ensure all necessary files are updated.
+
+#### Manual Process
+
+If you prefer to add skills manually:
 
 1. **Adding a new skill**: Create a new directory under `skills/` with a `SKILL.md` file
 2. **Modifying skills**: Edit the `SKILL.md` file in the appropriate skill directory
-3. **Testing**: Skills are automatically embedded during build - no special steps needed
-4. **Installation**: Users can install skills globally with `vibe skills` or `vibe init --install-skills`
+3. **Update documentation**: Add entries to README.md and SKILLS.md
+4. **Update installer**: Add skill to `internal/skills/installer.go`
+5. **Testing**: Skills are automatically embedded during build
+6. **Installation**: Users can install skills globally with `vibe skills` or `vibe init --install-skills`
 
 The skills are embedded using Go's `embed` package in `embedded.go` and installed to `~/.claude/skills/` when requested.
+
+For detailed step-by-step instructions, see the `skills/add-claude-skill/SKILL.md` and `skills/add-command-skill/SKILL.md` files. You can also reference existing skills like `skills/vibe-code-review/SKILL.md` or `skills/vibe-pr/SKILL.md` as examples.
 
 ## Testing
 
