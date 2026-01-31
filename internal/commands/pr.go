@@ -187,15 +187,21 @@ func createPRInteractive(ctx *CommandContext, opts *PRCommandOptions, branch str
 
 	// Push branch
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
-	s.Suffix = " Pushing branch..."
+	s.Suffix = " Checking remote status..."
 	s.Start()
 
-	if err := pushBranch(); err != nil {
-		s.Stop()
+	alreadyPushed, err := pushBranchIfNeeded(branch)
+	s.Stop()
+
+	if err != nil {
 		return fmt.Errorf("failed to push branch: %w", err)
 	}
-	s.Stop()
-	_, _ = green.Println("✓ Branch pushed")
+
+	if alreadyPushed {
+		_, _ = green.Println("✓ Branch already up to date on remote")
+	} else {
+		_, _ = green.Println("✓ Branch pushed")
+	}
 
 	// Extract ticket ID and fetch details
 	ticketID, _ := utils.ExtractTicketID(branch)
@@ -379,9 +385,18 @@ func createPRNonInteractive(ctx *CommandContext, opts *PRCommandOptions, branch 
 	// Show push summary
 	showPushSummary(branch, baseBranch)
 
-	// Push branch
-	if err := pushBranch(); err != nil {
+	// Push branch if needed
+	alreadyPushed, err := pushBranchIfNeeded(branch)
+	if err != nil {
 		return fmt.Errorf("failed to push branch: %w", err)
+	}
+
+	if alreadyPushed {
+		green := color.New(color.FgGreen)
+		_, _ = green.Println("✓ Branch already up to date on remote")
+	} else {
+		green := color.New(color.FgGreen)
+		_, _ = green.Println("✓ Branch pushed")
 	}
 
 	// Extract ticket ID
@@ -500,6 +515,57 @@ func pushBranch() error {
 		return fmt.Errorf("git push failed: %w\nOutput: %s", err, string(output))
 	}
 	return nil
+}
+
+// isBranchPushedToRemote checks if the current branch exists on remote
+func isBranchPushedToRemote(branch string) (bool, error) {
+	// Check if the branch has a remote tracking branch
+	cmd := exec.Command("git", "rev-parse", "--verify", fmt.Sprintf("origin/%s", branch))
+	err := cmd.Run()
+	if err != nil {
+		// Branch doesn't exist on remote
+		return false, nil
+	}
+
+	// Check if local and remote are in sync
+	cmd = exec.Command("git", "rev-list", "--count", fmt.Sprintf("%s..origin/%s", branch, branch))
+	output, err := cmd.Output()
+	if err != nil {
+		return true, nil // Remote exists, assume we need to push
+	}
+
+	behind := strings.TrimSpace(string(output))
+	if behind != "0" {
+		// Local is behind remote, something is wrong
+		return true, nil
+	}
+
+	// Check if we have commits to push
+	cmd = exec.Command("git", "rev-list", "--count", fmt.Sprintf("origin/%s..%s", branch, branch))
+	output, err = cmd.Output()
+	if err != nil {
+		return true, nil // Assume we need to push
+	}
+
+	ahead := strings.TrimSpace(string(output))
+	return ahead == "0", nil // If ahead is 0, we're already pushed
+}
+
+// pushBranchIfNeeded pushes the branch only if it's not already on remote or has unpushed commits
+func pushBranchIfNeeded(branch string) (bool, error) {
+	alreadyPushed, err := isBranchPushedToRemote(branch)
+	if err != nil {
+		// If we can't determine, try to push anyway
+		return false, pushBranch()
+	}
+
+	if alreadyPushed {
+		// Branch is already up to date on remote
+		return true, nil
+	}
+
+	// Need to push
+	return false, pushBranch()
 }
 
 func createPRWithGH(ctx *CommandContext, title, body, base, head string, draft bool) (*models.PullRequest, error) {
