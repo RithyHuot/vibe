@@ -29,6 +29,7 @@ Ask the user:
 - What arguments/flags does it need?
 - When should the skill be invoked?
 - What output should it provide?
+- What additional information you would like to provide to generate this command?
 
 ### 2. Create Command File
 
