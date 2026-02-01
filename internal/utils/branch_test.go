@@ -12,6 +12,7 @@ func TestGenerateBranchName(t *testing.T) {
 		prefix   string
 		ticketID string
 		title    string
+		username string
 		expected string
 	}{
 		{
@@ -49,11 +50,47 @@ func TestGenerateBranchName(t *testing.T) {
 			title:    "Add CI-CD pipeline",
 			expected: "tom/pqr345stu/add-ci-cd-pipeline",
 		},
+		{
+			name:     "should return username/ticketID format when title is empty",
+			prefix:   "john",
+			ticketID: "abc123xyz",
+			title:    "",
+			expected: "john/abc123xyz",
+		},
+		{
+			name:     "should use sanitized username as prefix when prefix is empty",
+			prefix:   "",
+			ticketID: "abc123xyz",
+			title:    "Add feature",
+			username: "John Doe",
+			expected: "john-doe/abc123xyz/add-feature",
+		},
+		{
+			name:     "should create username/ticketID format when both prefix and title are empty",
+			prefix:   "",
+			ticketID: "abc123xyz",
+			title:    "",
+			username: "Jane Smith",
+			expected: "jane-smith/abc123xyz",
+		},
+		{
+			name:     "should sanitize username by removing special characters",
+			prefix:   "",
+			ticketID: "def456uvw",
+			title:    "",
+			username: "Bob-O'Connor@123",
+			expected: "bob-oconnor123/def456uvw",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GenerateBranchName(tt.prefix, tt.ticketID, tt.title)
+			var result string
+			if tt.username != "" {
+				result = GenerateBranchName(tt.prefix, tt.ticketID, tt.title, tt.username)
+			} else {
+				result = GenerateBranchName(tt.prefix, tt.ticketID, tt.title)
+			}
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -247,6 +284,103 @@ func TestSanitizeInput(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := SanitizeInput(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeUsername(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "simple name",
+			input:    "john",
+			expected: "john",
+		},
+		{
+			name:     "name with spaces",
+			input:    "John Doe",
+			expected: "john-doe",
+		},
+		{
+			name:     "name with special characters",
+			input:    "Bob-O'Connor@123",
+			expected: "bob-oconnor123",
+		},
+		{
+			name:     "name with multiple spaces",
+			input:    "Jane    Smith",
+			expected: "jane-smith",
+		},
+		{
+			name:     "name with leading/trailing hyphens",
+			input:    "-alice-",
+			expected: "alice",
+		},
+		{
+			name:     "uppercase name",
+			input:    "JOHN DOE",
+			expected: "john-doe",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeUsername(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeBranchPart(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "simple description",
+			input:    "fix-login-bug",
+			expected: "fix-login-bug",
+		},
+		{
+			name:     "description with spaces",
+			input:    "Add user authentication",
+			expected: "add-user-authentication",
+		},
+		{
+			name:     "description with special characters",
+			input:    "Fix bug: API timeout!!!",
+			expected: "fix-bug-api-timeout",
+		},
+		{
+			name:     "description with underscores",
+			input:    "update_database_schema",
+			expected: "update_database_schema",
+		},
+		{
+			name:     "very long description",
+			input:    "This is a very long branch description that should be truncated to fit within fifty characters",
+			expected: "this-is-a-very-long-branch-description-that-should",
+		},
+		{
+			name:     "description with multiple spaces",
+			input:    "Update    database    schema",
+			expected: "update-database-schema",
+		},
+		{
+			name:     "description with leading/trailing spaces",
+			input:    "  fix bug  ",
+			expected: "fix-bug",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeBranchPart(tt.input)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
