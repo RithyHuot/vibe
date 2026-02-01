@@ -325,6 +325,17 @@ Examples:
 		return nil
 	}
 
+	// Branch command
+	branchCmd := commands.NewBranchCommand(dummyCtx)
+	branchCmd.PreRunE = func(_ *cobra.Command, _ []string) error {
+		ctx, err := getContext()
+		if err != nil {
+			return err
+		}
+		*branchCmd = *commands.NewBranchCommand(ctx)
+		return nil
+	}
+
 	// Add vibeCmd handling to root so "vibe <ticket-id>" works directly
 	rootCmd.Args = func(cmd *cobra.Command, args []string) error {
 		// If there's exactly one arg and it's not a subcommand, treat it as a ticket ID
@@ -366,5 +377,5 @@ Examples:
 		return cmd.Help()
 	}
 
-	rootCmd.AddCommand(ticketCmd, commentCmd, prCmd, prStatusCmd, prUpdateCmd, startCmd, mergeCmd, ciStatusCmd, ciFailureCmd, issuesCmd, issueCmd, issueCreateCmd, issueUpdateCmd)
+	rootCmd.AddCommand(ticketCmd, commentCmd, prCmd, prStatusCmd, prUpdateCmd, startCmd, mergeCmd, ciStatusCmd, ciFailureCmd, issuesCmd, issueCmd, issueCreateCmd, issueUpdateCmd, branchCmd)
 }

@@ -1,12 +1,30 @@
 package commands
 
 import (
+	"context"
+	"fmt"
+	"os/exec"
+	"time"
+
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/rithyhuot/vibe/internal/config"
 	"github.com/rithyhuot/vibe/internal/services/claude"
 	"github.com/rithyhuot/vibe/internal/services/clickup"
 	"github.com/rithyhuot/vibe/internal/services/git"
 	"github.com/rithyhuot/vibe/internal/services/github"
+	"github.com/rithyhuot/vibe/internal/ui"
 	"github.com/spf13/cobra"
+)
+
+const (
+	// User action constants for prompts
+	actionStashChanges    = "Stash changes"
+	actionCheckItOut      = "Check it out"
+	actionDeleteRecreate  = "Delete and recreate"
+	actionCancel          = "Cancel"
+
+	// Git stash timeout duration
+	gitStashTimeout = 30 * time.Second
 )
 
 // contextKey is a custom type for context keys to avoid collisions
@@ -70,4 +88,78 @@ func NewCommandContext(cfg *config.Config) (*CommandContext, error) {
 		GitRepo:       gitRepo,
 		ClaudeClient:  claudeClient,
 	}, nil
+}
+
+// handleUncommittedChanges checks for uncommitted changes and prompts user to stash if needed
+// Returns nil if it's safe to proceed with checkout, error otherwise
+func handleUncommittedChanges(ctx *CommandContext) error {
+	// Check for uncommitted changes
+	status, err := ctx.GitRepo.Status()
+	if err != nil {
+		return fmt.Errorf("failed to check git status: %w", err)
+	}
+
+	// If no changes, proceed
+	if len(status) == 0 {
+		return nil
+	}
+
+	// Count modified/added/deleted files (exclude untracked)
+	changedFiles := 0
+	untrackedFiles := 0
+	for _, fileStatus := range status {
+		if fileStatus == "untracked" {
+			untrackedFiles++
+		} else {
+			changedFiles++
+		}
+	}
+
+	// If only untracked files, proceed (but notify user)
+	if changedFiles == 0 {
+		if untrackedFiles > 0 {
+			_, _ = ui.Info.Printf("Note: %d untracked file(s) will remain in your working directory\n", untrackedFiles)
+		}
+		return nil
+	}
+
+	// Prompt user to stash changes
+	_, _ = ui.Warning.Printf("\n⚠️  You have %d uncommitted change(s)\n", changedFiles)
+	if untrackedFiles > 0 {
+		_, _ = ui.Dim.Printf("   (%d untracked file(s) will not be stashed)\n", untrackedFiles)
+	}
+	fmt.Println()
+
+	var action string
+	prompt := &survey.Select{
+		Message: "What would you like to do?",
+		Options: []string{actionStashChanges, actionCancel},
+		Default: actionStashChanges,
+	}
+	if err := survey.AskOne(prompt, &action); err != nil {
+		return err
+	}
+
+	if action == actionCancel {
+		return fmt.Errorf("checkout cancelled: uncommitted changes present")
+	}
+
+	// Stash the changes with timeout
+	_, _ = ui.Info.Println("Stashing uncommitted changes...")
+	cmdCtx, cancel := context.WithTimeout(context.Background(), gitStashTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(cmdCtx, "git", "stash", "push", "-m", "Auto-stash by vibe CLI")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		if cmdCtx.Err() == context.DeadlineExceeded {
+			return fmt.Errorf("stash operation timed out after %v", gitStashTimeout)
+		}
+		return fmt.Errorf("failed to stash changes: %w\nOutput: %s", err, string(output))
+	}
+
+	_, _ = ui.Success.Printf("✓ Changes stashed successfully\n")
+	_, _ = ui.Dim.Println("  (Use 'git stash pop' to restore them later)")
+
+	return nil
 }

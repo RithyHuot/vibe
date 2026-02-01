@@ -58,8 +58,17 @@ func runVibe(ctx *CommandContext, ticketID string) error {
 	// Display task details
 	displayTask(task)
 
-	// Generate branch name
-	branchName := utils.GenerateBranchName(ctx.Config.Git.BranchPrefix, ticketID, task.Name)
+	// Generate branch name with username fallback if needed
+	prefix, username, err := utils.ResolveBranchPrefix(ctx.Config.Git.BranchPrefix)
+	if err != nil {
+		return err
+	}
+	var branchName string
+	if username != "" {
+		branchName = utils.GenerateBranchName(prefix, ticketID, task.Name, username)
+	} else {
+		branchName = utils.GenerateBranchName(prefix, ticketID, task.Name)
+	}
 
 	// Validate branch name
 	if err := utils.ValidateBranchName(branchName); err != nil {
@@ -70,6 +79,11 @@ func runVibe(ctx *CommandContext, ticketID string) error {
 	exists, err := ctx.GitRepo.BranchExists(branchName)
 	if err != nil {
 		return fmt.Errorf("failed to check if branch exists: %w", err)
+	}
+
+	// Check for uncommitted changes before checkout
+	if err := handleUncommittedChanges(ctx); err != nil {
+		return err
 	}
 
 	if exists {

@@ -17,6 +17,7 @@ A production-quality Go CLI tool that streamlines developer workflow by integrat
 - 🌿 **Auto Branch Creation**: Generate standardized branches: `username/ticketid/description`
 - ✅ **Branch Validation**: Security checks for safe branch names
 - 🔄 **Branch Switching**: Seamlessly switch between feature branches
+- 💾 **Smart Stashing**: Automatically prompts to stash uncommitted changes before checkout
 - 📊 **Status Tracking**: View working tree status and changes
 
 ### Pull Requests
@@ -258,6 +259,7 @@ This removes all vibe skills from `~/.claude/skills/`. You can reinstall them an
 | Skill | Description | Usage |
 |-------|-------------|-------|
 | `vibe` | Start work on a ClickUp ticket | "vibe 86b7x5453" |
+| `vibe-branch` | Create and checkout a new branch | "create a branch" or "vibe branch abc123xyz" |
 | `vibe-ticket` | Get context on current ticket | "what am I working on?" |
 | `vibe-comment` | Add comment to ticket | "vibe comment <text>" |
 | `vibe-pr` | Create a pull request | "create a PR" |
@@ -636,6 +638,33 @@ This command will:
 2. Let you select a ticket interactively
 3. Create and checkout a branch
 4. Update the ticket status
+
+### `vibe branch [ticket-id]`
+
+Create and checkout a new branch with or without a ticket ID.
+
+```bash
+# Create branch with ticket ID
+vibe branch abc123xyz
+
+# Interactive mode - prompts for branch description
+vibe branch
+```
+
+This command creates simple branches without ClickUp integration:
+
+- **With ticket ID**: Creates branch in format `username/ticketid`
+- **Without ticket ID**: Prompts for description and creates `username/description`
+- Username is automatically extracted from `git config user.name`
+- No ClickUp API call is made (unlike `vibe <ticket-id>`)
+- **Uncommitted changes**: Automatically prompts to stash before checkout
+
+**Comparison with `vibe <ticket-id>`:**
+
+| Command | ClickUp Integration | Branch Format | Status Update |
+|---------|---------------------|---------------|---------------|
+| `vibe branch <ticket-id>` | No | `username/ticketid` | No |
+| `vibe <ticket-id>` | Yes | `username/ticketid/task-name` | Yes (to "In Progress") |
 
 ### `vibe pr`
 

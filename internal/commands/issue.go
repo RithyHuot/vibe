@@ -144,19 +144,6 @@ func extractIssueNumberFromBranch(branch string) int {
 	return 0
 }
 
-// extractUsernameFromBranch extracts username from branch name
-// Supports patterns: username/issue-123/..., username/feature/...
-func extractUsernameFromBranch(branch string) string {
-	// Look for pattern: username/...
-	if strings.Contains(branch, "/") {
-		parts := strings.Split(branch, "/")
-		if len(parts) > 0 && parts[0] != "" {
-			return parts[0]
-		}
-	}
-	return ""
-}
-
 // displayIssue displays issue details with formatting
 //
 //nolint:gocyclo // Complexity is acceptable for comprehensive issue display
@@ -284,25 +271,20 @@ func offerCreateBranchForIssue(ctx *CommandContext, issue *models.Issue) error {
 		return nil
 	}
 
-	// Determine branch prefix (username)
-	branchPrefix := ctx.Config.Git.BranchPrefix
-	if branchPrefix == "your-username" {
-		// Try to extract username from current branch
-		currentBranch, err := ctx.GitRepo.CurrentBranch()
-		if err == nil {
-			if username := extractUsernameFromBranch(currentBranch); username != "" {
-				branchPrefix = username
-			}
-		}
+	// Resolve branch prefix with username fallback
+	branchPrefix, gitUsername, err := utils.ResolveBranchPrefix(ctx.Config.Git.BranchPrefix)
+	if err != nil {
+		return err
 	}
 
 	// Generate branch name from issue
-	// Format: username/issue-{number}/{title-slug}
-	branchName := utils.GenerateBranchName(
-		branchPrefix,
-		fmt.Sprintf("issue-%d", issue.Number),
-		issue.Title,
-	)
+	issueID := fmt.Sprintf("issue-%d", issue.Number)
+	var branchName string
+	if gitUsername != "" {
+		branchName = utils.GenerateBranchName(branchPrefix, issueID, issue.Title, gitUsername)
+	} else {
+		branchName = utils.GenerateBranchName(branchPrefix, issueID, issue.Title)
+	}
 
 	// Validate branch name
 	if err := utils.ValidateBranchName(branchName); err != nil {
@@ -313,6 +295,11 @@ func offerCreateBranchForIssue(ctx *CommandContext, issue *models.Issue) error {
 	exists, err := ctx.GitRepo.BranchExists(branchName)
 	if err != nil {
 		return fmt.Errorf("failed to check if branch exists: %w", err)
+	}
+
+	// Check for uncommitted changes before checkout
+	if err := handleUncommittedChanges(ctx); err != nil {
+		return err
 	}
 
 	if exists {
@@ -383,3 +370,4 @@ func fetchIssueWithFallback(ctx *CommandContext, issueNumber int, includeComment
 		return client.GetIssue(context.Background(), issueNumber, includeComments)
 	})
 }
+

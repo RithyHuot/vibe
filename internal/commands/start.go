@@ -181,8 +181,17 @@ func startFromExisting(ctx *CommandContext, ticketID string) error {
 	s.Stop()
 	_, _ = ui.Success.Printf("✓ Found: %s\n", task.Name)
 
-	// Generate branch name
-	branchName := utils.GenerateBranchName(ctx.Config.Git.BranchPrefix, ticketID, task.Name)
+	// Generate branch name with username fallback if needed
+	prefix, username, err := utils.ResolveBranchPrefix(ctx.Config.Git.BranchPrefix)
+	if err != nil {
+		return err
+	}
+	var branchName string
+	if username != "" {
+		branchName = utils.GenerateBranchName(prefix, ticketID, task.Name, username)
+	} else {
+		branchName = utils.GenerateBranchName(prefix, ticketID, task.Name)
+	}
 
 	// Get current branch
 	currentBranch, err := ctx.GitRepo.CurrentBranch()
@@ -197,7 +206,20 @@ func startFromExisting(ctx *CommandContext, ticketID string) error {
 		return nil
 	}
 
-	// Check if branch exists
+	// Handle branch creation/checkout with uncommitted changes check
+	if err := handleBranchCreationForStart(ctx, branchName); err != nil {
+		return err
+	}
+
+	fmt.Println()
+	_, _ = ui.Success.Printf("✓ Created branch: %s\n", ui.Cyan.Sprint(branchName))
+	fmt.Printf("  Ticket: %s\n", ui.Info.Sprint(task.URL))
+
+	return nil
+}
+
+// handleBranchCreationForStart handles branch existence check and creation for start command
+func handleBranchCreationForStart(ctx *CommandContext, branchName string) error {
 	exists, err := ctx.GitRepo.BranchExists(branchName)
 	if err != nil {
 		return fmt.Errorf("failed to check if branch exists: %w", err)
@@ -207,27 +229,36 @@ func startFromExisting(ctx *CommandContext, ticketID string) error {
 		var action string
 		prompt := &survey.Select{
 			Message: fmt.Sprintf("Branch %s already exists.", ui.Cyan.Sprint(branchName)),
-			Options: []string{"Check it out", "Delete and recreate", "Cancel"},
+			Options: []string{actionCheckItOut, actionDeleteRecreate, actionCancel},
 		}
 		if err := survey.AskOne(prompt, &action); err != nil {
 			return err
 		}
 
 		switch action {
-		case "Cancel":
+		case actionCancel:
 			return nil
-		case "Check it out":
+		case actionCheckItOut:
+			// Check for uncommitted changes before checkout
+			if err := handleUncommittedChanges(ctx); err != nil {
+				return err
+			}
 			if err := ctx.GitRepo.Checkout(branchName); err != nil {
 				return fmt.Errorf("failed to checkout branch: %w", err)
 			}
 			_, _ = ui.Success.Printf("✓ Checked out branch: %s\n", branchName)
 			return nil
-		case "Delete and recreate":
+		case actionDeleteRecreate:
 			// Delete branch using git command (go-git doesn't support delete easily)
 			if err := deleteBranch(branchName); err != nil {
 				return fmt.Errorf("failed to delete branch: %w", err)
 			}
 		}
+	}
+
+	// Check for uncommitted changes before checkout
+	if err := handleUncommittedChanges(ctx); err != nil {
+		return err
 	}
 
 	// Create and checkout new branch
@@ -238,10 +269,6 @@ func startFromExisting(ctx *CommandContext, ticketID string) error {
 	if err := ctx.GitRepo.Checkout(branchName); err != nil {
 		return fmt.Errorf("failed to checkout branch: %w", err)
 	}
-
-	fmt.Println()
-	_, _ = ui.Success.Printf("✓ Created branch: %s\n", ui.Cyan.Sprint(branchName))
-	fmt.Printf("  Ticket: %s\n", ui.Info.Sprint(task.URL))
 
 	return nil
 }

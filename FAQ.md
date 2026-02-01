@@ -335,23 +335,28 @@ vibe merge
 
 ### How do I work on multiple tickets simultaneously?
 
-Use Git branches to switch between tickets. **Important:** You must commit or stash your changes before switching.
+Use Git branches to switch between tickets. Vibe automatically detects uncommitted changes and prompts you to stash them.
 
 ```bash
 # Start first ticket
 vibe workon TICKET_1
 # ... work on ticket 1 ...
 
-# Commit your changes before switching
-git add .
-git commit -m "Work in progress on ticket 1"
-
-# Switch to second ticket
+# Switch to second ticket (vibe will prompt to stash uncommitted changes)
 vibe workon TICKET_2
+# ⚠️  You have 3 uncommitted change(s)
+# ? What would you like to do?
+#   > Stash changes
+#     Cancel
+# ✓ Changes stashed successfully
+
 # ... work on ticket 2 ...
 
-# Commit changes on ticket 2
-git add .
+# Switch back to ticket 1
+vibe workon TICKET_1
+
+# Restore stashed changes
+git stash pop
 git commit -m "Work in progress on ticket 2"
 
 # Switch back to first ticket
@@ -360,21 +365,134 @@ git checkout username/ticket-1-description
 vibe workon TICKET_1
 ```
 
-**Alternative: Use git stash**
-
-If you don't want to commit yet:
+**Note:** Vibe automatically handles uncommitted changes by prompting you to stash them when switching branches. You can also manually stash changes:
 
 ```bash
-# On ticket 1, stash uncommitted changes
+# Manually stash if needed
 git stash
 
-# Switch to ticket 2
-vibe workon TICKET_2
-# ... work on ticket 2 ...
+# View stashed changes
+git stash list
 
-# Switch back and restore changes
-git checkout username/ticket-1-description
+# Restore latest stash
 git stash pop
+
+# Restore specific stash
+git stash apply stash@{1}
+```
+
+### What happens if I have uncommitted changes when switching branches?
+
+Vibe automatically detects uncommitted changes and prompts you before switching branches:
+
+```bash
+vibe branch new-feature
+
+⚠️  You have 3 uncommitted change(s)
+
+? What would you like to do?
+  > Stash changes
+    Cancel
+
+Stashing uncommitted changes...
+✓ Changes stashed successfully
+  (Use 'git stash pop' to restore them later)
+```
+
+**Behavior:**
+
+- **Stash changes**: Your changes are safely stored and you can proceed with branch checkout
+- **Cancel**: Operation is cancelled, you stay on current branch with uncommitted changes
+- **Untracked files**: Not stashed automatically (only modified/added/deleted files are stashed)
+
+**To restore stashed changes:**
+
+```bash
+git stash pop  # Apply and remove from stash
+# or
+git stash apply  # Apply but keep in stash
+```
+
+### Troubleshooting: Stash-Related Issues
+
+#### What if stash fails?
+
+If stashing fails, you'll see an error message with details. Common causes:
+
+1. **Merge conflicts in working directory**
+   ```bash
+   # Resolve conflicts first, then try again
+   git status  # Check conflicted files
+   # Fix conflicts manually
+   git add <resolved-files>
+   ```
+
+2. **Permission issues**
+   ```bash
+   # Check file permissions
+   ls -la
+   # Ensure you have write access to .git directory
+   ```
+
+3. **Corrupted git repository**
+   ```bash
+   # Verify repository integrity
+   git fsck
+   ```
+
+#### How do I recover from a failed stash?
+
+If something goes wrong during stashing:
+
+```bash
+# View all stashes
+git stash list
+
+# See what's in a specific stash
+git stash show stash@{0}
+
+# Apply a specific stash
+git stash apply stash@{0}
+
+# Drop a stash if needed
+git stash drop stash@{0}
+
+# Emergency: recover dropped stash (within ~90 days)
+git fsck --unreachable | grep commit | cut -d' ' -f3 | xargs git log --oneline
+```
+
+#### What happens to merge conflicts in stashed changes?
+
+When you apply a stash with conflicts:
+
+```bash
+# Apply stash
+git stash pop
+
+# If conflicts occur:
+# 1. Git marks conflicted files
+# 2. Resolve conflicts manually
+# 3. Stage resolved files
+git add <resolved-files>
+
+# 4. Stash is NOT automatically dropped
+# 5. Drop it manually after resolving
+git stash drop
+```
+
+#### Can I stash specific files?
+
+Yes, use git directly:
+
+```bash
+# Stash specific files
+git stash push -m "Partial work" file1.go file2.go
+
+# Stash everything except certain files
+git stash push --keep-index
+
+# Stash including untracked files
+git stash push -u -m "Including untracked"
 ```
 
 ### Can I create a PR without a ClickUp ticket?

@@ -12,6 +12,13 @@ Claude Code skills are AI-powered integrations that allow Claude Code to interac
 
 ## Available Skills
 
+**Note on Uncommitted Changes**: All branch-switching commands (`vibe`, `vibe branch`, `vibe start`, etc.) automatically detect uncommitted changes and prompt the user to stash them before checkout. This prevents accidental loss of work. Users can choose to:
+
+- **Stash changes**: Safely store changes and proceed
+- **Cancel**: Abort the operation and keep working on current branch
+
+---
+
 ### 1. vibe
 
 **Purpose**: Start work on a ClickUp ticket
@@ -23,6 +30,7 @@ Claude Code skills are AI-powered integrations that allow Claude Code to interac
 - Creates or checks out a branch for the ticket
 - Automatically fetches ticket context
 - Updates task status to "In Progress"
+- Prompts to stash uncommitted changes if present
 
 **Example usage**:
 
@@ -30,6 +38,8 @@ Claude Code skills are AI-powered integrations that allow Claude Code to interac
 User: "vibe 86b7x5453"
 Claude: Runs `vibe 86b7x5453`, then `vibe ticket` to get context
 ```
+
+**Note**: If you have uncommitted changes, vibe will automatically prompt you to stash them before switching branches.
 
 ---
 

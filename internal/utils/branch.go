@@ -3,6 +3,7 @@ package utils
 
 import (
 	"fmt"
+	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -19,8 +20,21 @@ var (
 )
 
 // GenerateBranchName creates a branch name from components
-// Format: prefix/ticketID/sanitized-title
-func GenerateBranchName(prefix, ticketID, title string) string {
+// Format: prefix/ticketID/sanitized-title (when title is provided)
+// Format: prefix/ticketID (when title is empty)
+// If prefix is empty and username is provided, uses sanitized username as prefix
+func GenerateBranchName(prefix, ticketID, title string, username ...string) string {
+	// Use username as fallback if prefix is empty
+	branchPrefix := prefix
+	if branchPrefix == "" && len(username) > 0 && username[0] != "" {
+		branchPrefix = SanitizeUsername(username[0])
+	}
+
+	// If title is empty, return simple format: prefix/ticketID
+	if title == "" {
+		return fmt.Sprintf("%s/%s", branchPrefix, ticketID)
+	}
+
 	// Sanitize title: lowercase, replace spaces with hyphens, remove invalid chars
 	sanitized := strings.ToLower(title)
 	sanitized = strings.TrimSpace(sanitized)
@@ -39,7 +53,89 @@ func GenerateBranchName(prefix, ticketID, title string) string {
 		sanitized = strings.TrimRight(sanitized, "-")
 	}
 
-	return fmt.Sprintf("%s/%s/%s", prefix, ticketID, sanitized)
+	return fmt.Sprintf("%s/%s/%s", branchPrefix, ticketID, sanitized)
+}
+
+// SanitizeUsername sanitizes a username for use in branch names
+// Converts to lowercase, replaces spaces with hyphens, removes special characters
+func SanitizeUsername(username string) string {
+	// Convert to lowercase
+	s := strings.ToLower(username)
+
+	// Replace spaces with hyphens
+	s = strings.ReplaceAll(s, " ", "-")
+
+	// Remove special characters (keep only alphanumeric and hyphens)
+	s = regexp.MustCompile(`[^a-z0-9\-]`).ReplaceAllString(s, "")
+
+	// Remove multiple consecutive hyphens
+	s = regexp.MustCompile(`-+`).ReplaceAllString(s, "-")
+
+	// Trim hyphens from start and end
+	s = strings.Trim(s, "-")
+
+	return s
+}
+
+// SanitizeBranchPart sanitizes a branch part (description) for use in branch names
+func SanitizeBranchPart(part string) string {
+	// Convert to lowercase
+	s := strings.ToLower(part)
+
+	// Trim spaces
+	s = strings.TrimSpace(s)
+
+	// Replace spaces with hyphens
+	s = regexp.MustCompile(`\s+`).ReplaceAllString(s, "-")
+
+	// Remove special characters (keep only alphanumeric, hyphens, and underscores)
+	s = regexp.MustCompile(`[^a-z0-9\-_]`).ReplaceAllString(s, "")
+
+	// Remove multiple consecutive hyphens
+	s = regexp.MustCompile(`-+`).ReplaceAllString(s, "-")
+
+	// Trim hyphens from start and end
+	s = strings.Trim(s, "-")
+
+	// Limit length
+	if len(s) > 50 {
+		s = s[:50]
+		s = strings.TrimRight(s, "-")
+	}
+
+	return s
+}
+
+// GetGitUsername retrieves the git user.name from git config
+func GetGitUsername() (string, error) {
+	cmd := exec.Command("git", "config", "user.name")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("git config user.name not set")
+	}
+
+	username := strings.TrimSpace(string(output))
+	if username == "" {
+		return "", fmt.Errorf("git config user.name is empty")
+	}
+
+	return username, nil
+}
+
+// ResolveBranchPrefix resolves the branch prefix, using git username as fallback if prefix is "your-username"
+// Returns the resolved prefix and username (empty string if not using username fallback)
+// Returns error if prefix is "your-username" but git username is not configured
+func ResolveBranchPrefix(configPrefix string) (prefix string, username string, err error) {
+	if configPrefix == "your-username" {
+		gitUsername, err := GetGitUsername()
+		if err != nil {
+			// Return error instead of silently falling back to placeholder
+			return "", "", fmt.Errorf("branch prefix is set to 'your-username' but git config user.name is not set: %w", err)
+		}
+		// Use empty prefix with username fallback
+		return "", gitUsername, nil
+	}
+	return configPrefix, "", nil
 }
 
 // ValidateBranchName checks if a branch name is safe
