@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `vibe branch` command can now be used without a ticket ID for simple branch creation
+
+### Fixed
+
+- Release configuration and Dockerfile improvements for better builds
+
+### Changed
+
+- Updated Claude skills with improved verbiage and descriptions
+- Enhanced add-command-skill with additional configuration prompts
+
 ## [0.1.0] - 2026-01-31
 
 ### Added
@@ -138,6 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Addressed linter issues for code quality
 - Fixed redundant git push operations in PR creation workflow
+- Fixed release configuration and Dockerfile for proper builds
 
 ### Changed
 
