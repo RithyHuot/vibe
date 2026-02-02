@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -23,7 +24,8 @@ const (
 	actionDeleteRecreate  = "Delete and recreate"
 	actionCancel          = "Cancel"
 
-	// Git stash timeout duration
+	// gitStashTimeout is the maximum time to wait for git stash operation
+	// 30s should be sufficient for most repos; very large repos may need adjustment
 	gitStashTimeout = 30 * time.Second
 )
 
@@ -105,6 +107,7 @@ func handleUncommittedChanges(ctx *CommandContext) error {
 	}
 
 	// Count modified/added/deleted files (exclude untracked)
+	// Note: map iteration order is undefined, but order doesn't matter for counting
 	changedFiles := 0
 	untrackedFiles := 0
 	for _, fileStatus := range status {
@@ -155,7 +158,11 @@ func handleUncommittedChanges(ctx *CommandContext) error {
 		if cmdCtx.Err() == context.DeadlineExceeded {
 			return fmt.Errorf("stash operation timed out after %v", gitStashTimeout)
 		}
-		return fmt.Errorf("failed to stash changes: %w\nOutput: %s", err, string(output))
+		outputStr := strings.TrimSpace(string(output))
+		if len(outputStr) > 500 {
+			outputStr = outputStr[:500] + "... (truncated)"
+		}
+		return fmt.Errorf("failed to stash changes: %w\nOutput:\n%s", err, outputStr)
 	}
 
 	_, _ = ui.Success.Printf("✓ Changes stashed successfully\n")
