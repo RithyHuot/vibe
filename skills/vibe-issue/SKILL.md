@@ -1,12 +1,22 @@
 ---
 name: vibe-issue
 description: View GitHub issue details including title, description, assignees, labels, milestone, state, and optionally comments. Use when user asks to "show issue", "view issue #123", or needs issue details.
-allowed-tools: Bash(vibe:*), Bash(gh:*)
+allowed-tools: Bash(vibe:*), Bash(gh:*), AskUserQuestion
 ---
 
 # View GitHub Issue
 
-## Usage
+## Steps
+
+1. **Determine issue number**:
+   - If user provided an issue number in `$ARGUMENTS`, use it
+   - If no issue number provided, check if it can be auto-detected from current branch name
+   - If auto-detection fails or no branch context, use AskUserQuestion to ask: "Which issue number would you like to view?"
+
+2. **Check for comments flag**:
+   - If user wants to see comments, use AskUserQuestion to ask: "Would you like to include comments?" (Options: Yes, No)
+
+3. **Run the command**:
 
 ```bash
 vibe issue [issue-number] [--comments]

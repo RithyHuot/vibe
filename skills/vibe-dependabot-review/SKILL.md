@@ -2,7 +2,7 @@
 name: vibe-dependabot-review
 description: Review Dependabot PRs for breaking changes and create a draft PR with fixes. Use when user says "review dependabot", "check dependabot PR", or wants to handle dependency updates safely.
 argument-hint: [pr-number]
-allowed-tools: Bash(vibe:*), Bash(gh:*), Bash(git:*), Read, Grep, Glob, Edit, Write
+allowed-tools: Bash(vibe:*), Bash(gh:*), Bash(git:*), Read, Grep, Glob, Edit, Write, AskUserQuestion
 ---
 
 # Dependabot PR Review & Fix
@@ -28,21 +28,22 @@ Automatically review Dependabot pull requests to identify potential breaking cha
 
 ### 1. Identify Dependabot PR
 
-First, determine which PR to review using the `$ARGUMENTS` variable:
+First, determine which PR to review:
 
-```bash
-# If PR number provided as argument, use it
-if [ -n "$ARGUMENTS" ]; then
-  PR_NUMBER="$ARGUMENTS"
-  gh pr view $PR_NUMBER --json number,title,author,headRefName,baseRefName,body,url
-else
-  # If no PR number, check if current branch is from Dependabot
-  CURRENT_BRANCH=$(git branch --show-current)
+**If PR number provided in `$ARGUMENTS`:**
 
-  # List recent Dependabot PRs for user to select
-  gh pr list --author "app/dependabot" --limit 10 --json number,title,createdAt,headRefName
-fi
-```
+- Use it directly
+
+**If no PR number provided:**
+
+1. Check if current branch is from Dependabot
+2. If not on a Dependabot branch, list recent Dependabot PRs:
+
+   ```bash
+   gh pr list --author "app/dependabot" --limit 10 --json number,title,createdAt,headRefName
+   ```
+
+3. Use AskUserQuestion to ask: "Which Dependabot PR would you like to review?" (Provide list of PR numbers with titles)
 
 **Dependabot PR Patterns:**
 

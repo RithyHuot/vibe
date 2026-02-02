@@ -27,15 +27,17 @@ Before starting, gather:
 
 ### 1. Gather Requirements
 
-Ask the user:
+Use AskUserQuestion to gather all necessary information:
 
-- What is the skill name?
-- What workflow does it automate?
-- When should Claude invoke this skill?
-- Which vibe commands will it use?
-- What tools does it need access to?
-- What should the output be?
-- What additional information you would like to provide to generate this command?
+**Questions to ask:**
+
+1. **Skill Name**: "What is the skill name?" (e.g., "deployment-check", "ticket-analysis")
+2. **Workflow Purpose**: "What workflow does this skill automate?"
+3. **Trigger Conditions**: "When should Claude invoke this skill?" (e.g., specific user phrases)
+4. **Commands Used**: "Which vibe commands will this skill use?"
+5. **Tools Needed**: "What tools does it need access to?" (e.g., Bash, Read, Grep, Edit, Write, Glob)
+6. **Expected Output**: "What should the output be?"
+7. **Additional Context**: "What additional information would you like to provide to generate this skill?"
 
 ### 2. Create Skill Directory and File
 

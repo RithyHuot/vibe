@@ -1,12 +1,29 @@
 ---
 name: vibe-issue-update
 description: Update an existing GitHub issue including title, body, state, assignees, labels, milestone, and projects. Use when user wants to "update issue", "close issue", "change issue", or modify issue metadata.
-allowed-tools: Bash(vibe:*), Bash(gh:*)
+allowed-tools: Bash(vibe:*), Bash(gh:*), AskUserQuestion
 ---
 
 # Update GitHub Issue
 
-## Usage
+## Steps
+
+### 1. Determine What to Update
+
+If the user hasn't specified what to update, use AskUserQuestion to ask:
+
+"What would you like to update on the issue?"
+
+Available options:
+- Title
+- Description/Body
+- State (open/closed)
+- Assignees
+- Labels
+- Milestone
+- Projects
+
+### 2. Execute the Update
 
 ```bash
 vibe issue-update <issue-number> [flags]

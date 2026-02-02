@@ -2,18 +2,25 @@
 name: vibe-pr-status
 description: Check the status of a pull request including CI checks and approvals.
 argument-hint: [pr-number]
-allowed-tools: Bash(vibe:*)
+allowed-tools: Bash(vibe:*), AskUserQuestion
 ---
 
 # Check PR Status
 
-Check the status of a pull request:
+## Steps
+
+1. **Determine PR number**:
+   - If `$ARGUMENTS` contains a PR number, use it
+   - If no PR number provided, try to auto-detect from current branch
+   - If auto-detection fails, use AskUserQuestion to ask: "Which PR number would you like to check?"
+
+2. **Check the status**:
 
 ```bash
 vibe pr-status $ARGUMENTS
 ```
 
-If no PR number is provided, it checks the PR for the current branch.
+If no PR number is provided and current branch has a PR, it checks that PR automatically.
 
 ## Output Includes
 

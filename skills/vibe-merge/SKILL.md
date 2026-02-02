@@ -2,7 +2,7 @@
 name: vibe-merge
 description: Merge a pull request and post a merge comment. Only use when explicitly requested.
 disable-model-invocation: true
-allowed-tools: Bash(vibe:*), Bash(git:*)
+allowed-tools: Bash(vibe:*), Bash(git:*), AskUserQuestion
 ---
 
 # Merge Pull Request
@@ -19,18 +19,25 @@ Before merging, verify:
 
 ## Steps
 
-1. **Check PR status**:
+1. **Determine PR number**:
+   - If `$ARGUMENTS` contains a PR number, use it
+   - If no PR number provided, try to auto-detect from current branch
+   - If auto-detection fails, use AskUserQuestion to ask: "Which PR number would you like to merge?"
+
+2. **Check PR status**:
 
    ```bash
-   vibe pr-status
+   vibe pr-status [pr-number]
    ```
 
-2. **Ask for confirmation**:
-   - Show the user the PR status
-   - Ask: "Are you sure you want to merge this PR?"
-   - Wait for explicit "yes" confirmation
+3. **Ask for confirmation** using AskUserQuestion:
+   - Show the user the PR status (CI checks, approvals, merge status)
+   - Use AskUserQuestion to ask: "Are you sure you want to merge this PR?" (Options: Yes, No, Check status again)
+   - **REQUIRED**: Wait for explicit "Yes" confirmation
+   - If "Check status again", return to step 2
+   - If "No", abort the merge
 
-3. **Merge** (only after confirmation):
+4. **Merge** (only after confirmation):
 
    ```bash
    vibe merge [pr-number]
