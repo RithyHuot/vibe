@@ -2,7 +2,7 @@
 name: vibe-ci-status
 description: Check CircleCI status for a branch and help fix CI failures. Use when user asks about CI, mentions "failing tests", or says "vibe ci-status".
 argument-hint: [branch]
-allowed-tools: Bash(vibe:*), Bash(git:*), Read, Grep, Glob
+allowed-tools: Bash(vibe:*), Bash(git:*), Read, Grep, Glob, AskUserQuestion
 ---
 
 # Check CircleCI Status
@@ -21,7 +21,13 @@ This shows:
 
 ## Step 2: Get Failure Details
 
-If there are failed jobs, get the full output:
+If there are failed jobs:
+
+1. **Multiple failures**: Use AskUserQuestion to ask "Which failed job would you like to investigate?" and provide the list of failed job numbers
+2. **Single failure**: Automatically proceed with that job
+3. **No failures**: Skip this step
+
+Get the full output for the selected job:
 
 ```bash
 vibe ci-failure [job-number]

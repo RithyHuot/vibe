@@ -2,7 +2,7 @@
 name: vibe-branch
 description: Create and checkout a new branch. Use when the user wants to create a branch with or without a ticket ID (e.g., "create a branch", "vibe branch abc123xyz").
 argument-hint: [ticket-id]
-allowed-tools: Bash(vibe:branch*)
+allowed-tools: Bash(vibe:branch*), AskUserQuestion
 ---
 
 # Create and Checkout a New Branch
@@ -11,9 +11,16 @@ When the user wants to create a new branch, use the `vibe branch` command. This 
 
 ## Steps
 
-### With Ticket ID
+### 1. Determine Branch Type
 
-If the user provides a ticket ID, create a simple branch without fetching from ClickUp:
+Ask the user if they haven't specified:
+
+- **With Ticket ID**: If the user provides a ticket ID in their request, proceed directly to creating the branch
+- **Without Ticket ID**: If the user wants a custom branch without a ticket ID, use AskUserQuestion to ask: "What would you like to name the branch?" or let the CLI prompt interactively
+
+### 2. Create the Branch
+
+**With Ticket ID**:
 
 ```bash
 vibe branch <ticket-id>
@@ -21,16 +28,14 @@ vibe branch <ticket-id>
 
 This creates a branch in the format: `username/ticketid`
 
-### Without Ticket ID (Interactive)
-
-If the user wants to create a branch without a ticket ID:
+**Without Ticket ID (Interactive)**:
 
 ```bash
 vibe branch
 ```
 
 This will:
-1. Prompt for a branch description
+1. Prompt for a branch description (if not already provided via AskUserQuestion)
 2. Create a branch in the format: `username/description`
 
 ## When to Use This Skill

@@ -2,7 +2,7 @@
 name: vibe-pr
 description: Create a pull request using the vibe CLI. Use when the user says "vibe pr", "create a PR", "open a PR", or indicates code is ready for review.
 disable-model-invocation: true
-allowed-tools: Bash(vibe:*), Bash(gh:*), Bash(git:*), Read
+allowed-tools: Bash(vibe:*), Bash(gh:*), Bash(git:*), Read, AskUserQuestion
 ---
 
 # Create a Pull Request
@@ -15,10 +15,18 @@ allowed-tools: Bash(vibe:*), Bash(gh:*), Bash(git:*), Read
    - Get commit history: `git log --oneline origin/HEAD...HEAD` or `git log --oneline main...HEAD`
    - Extract ticket ID from branch name (format: `username/{ticketid}/...`)
 
-2. **Offer code review** (ask the user):
-   - Before creating the PR, ask if they'd like you to run a code review first
+2. **Ask user questions** using AskUserQuestion:
+
+   **Code Review:**
+   - "Would you like me to run a code review before creating the PR?"
    - If yes, review the changes for issues, improvements, and potential bugs
    - Address any findings before proceeding
+
+   **PR Type (if applicable):**
+   - "Is this a draft PR or ready for review?" (Options: Draft, Ready for Review)
+
+   **Additional Context (if needed):**
+   - If the changes are complex or unclear, ask: "Is there any additional context or background I should include in the PR description?"
 
 3. **Generate content** for each section (you are responsible for generating this):
    - **Title**: Concise description of the change (often matches ticket name)

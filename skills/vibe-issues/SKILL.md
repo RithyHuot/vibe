@@ -1,12 +1,19 @@
 ---
 name: vibe-issues
 description: List GitHub issues with optional filtering and interactive selection. Use when user asks to "list issues", "show issues", "see all issues", or wants to browse issues.
-allowed-tools: Bash(vibe:*), Bash(gh:*)
+allowed-tools: Bash(vibe:*), Bash(gh:*), AskUserQuestion
 ---
 
 # List GitHub Issues
 
-## Usage
+## Steps
+
+1. **Ask for preferences** using AskUserQuestion if not specified:
+
+   - **State Filter**: "Which issue state would you like to see?" (Options: Open (default), Closed, All)
+   - **Interactive Mode**: "Would you like to use interactive selection mode to browse and select an issue?" (Options: Yes, No)
+
+2. **Run the command**:
 
 ```bash
 vibe issues [--state open|closed|all] [--select]

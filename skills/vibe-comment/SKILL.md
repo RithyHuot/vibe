@@ -2,18 +2,22 @@
 name: vibe-comment
 description: Add a comment to the current ClickUp ticket. Use when the user says "vibe comment" or wants to add a comment to the ticket.
 argument-hint: <comment text>
-allowed-tools: Bash(vibe:*)
+allowed-tools: Bash(vibe:*), AskUserQuestion
 ---
 
 # Add Comment to Ticket
 
-Add a comment to the current ClickUp ticket:
+## Steps
+
+1. **Check for comment text**:
+   - If `$ARGUMENTS` is provided, use it directly
+   - If `$ARGUMENTS` is empty, use AskUserQuestion to ask: "What would you like to comment on the ticket?"
+
+2. **Add the comment**:
 
 ```bash
 vibe comment "$ARGUMENTS"
 ```
-
-If the user provides comment text, use it directly. If $ARGUMENTS is empty, ask: "What would you like to comment on the ticket?"
 
 ## When to Use
 

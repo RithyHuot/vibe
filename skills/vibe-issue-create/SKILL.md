@@ -2,7 +2,7 @@
 name: vibe-issue-create
 description: Create a new GitHub issue. Use when user says "create an issue", "report a bug", "file an issue", "request a feature", or wants to create a new issue.
 disable-model-invocation: true
-allowed-tools: Bash(vibe:*), Bash(gh:*), Read
+allowed-tools: Bash(vibe:*), Bash(gh:*), Read, AskUserQuestion
 ---
 
 # Create a GitHub Issue
@@ -12,9 +12,30 @@ allowed-tools: Bash(vibe:*), Bash(gh:*), Read
 1. **Gather context**:
    - Read issue template if it exists: `.github/ISSUE_TEMPLATE.md`
    - Understand what the user wants to report (bug, feature, question, etc.)
-   - Ask clarifying questions if needed
 
-2. **Generate content** (you are responsible for generating this):
+2. **Ask for required and optional information** using AskUserQuestion if not already provided:
+
+   **Required:**
+   - **Title**: "What is the issue title?" (Clear, concise summary)
+
+   **Optional but recommended:**
+   - **Issue Type**: "What type of issue is this?" (Options: Bug, Feature, Enhancement, Question, Documentation)
+   - **Description Details**: If it's a bug, ask:
+     - "What is the problem or unexpected behavior?"
+     - "What are the steps to reproduce?"
+     - "What was the expected behavior?"
+   - If it's a feature, ask:
+     - "What feature would you like to add?"
+     - "Why is this feature needed?"
+     - "Do you have implementation suggestions?"
+
+   **Metadata (optional):**
+   - **Labels**: "What labels should be added?" (e.g., bug, feature, urgent, high-priority)
+   - **Assignees**: "Who should be assigned to this issue?" (GitHub usernames)
+   - **Milestone**: "Which milestone should this be added to?" (e.g., v1.0, Sprint 5)
+   - **Projects**: "Which GitHub project should this be added to?"
+
+3. **Generate content** (you are responsible for generating this):
    - **Title**: Clear, concise summary of the issue
    - **Description**: Detailed explanation including:
      - Problem description or feature request
@@ -28,14 +49,14 @@ allowed-tools: Bash(vibe:*), Bash(gh:*), Read
      - Milestone: version/sprint to target
      - Projects: GitHub Projects to add the issue to
 
-3. **Get explicit user approval**:
+4. **Get explicit user approval**:
    - **REQUIRED**: Show the user the complete issue details (title, description, metadata)
    - **REQUIRED**: Ask: "Ready to create this issue?"
    - **REQUIRED**: Wait for explicit confirmation (e.g., "yes", "create it", "go ahead")
    - **Do NOT proceed** until you receive explicit approval
    - **Exception**: Skip approval if user's original request explicitly included `--yes` flag
 
-4. **Create the issue** after receiving approval:
+5. **Create the issue** after receiving approval:
 
    ```bash
    vibe issue-create -y --title "..." --body "..." --labels bug,urgent --assignees user1

@@ -2,7 +2,7 @@
 name: vibe-pr-update
 description: Update sections of an existing pull request. Use when the user wants to improve or fix the PR description.
 argument-hint: [--summary "..." --description "..." --testing "..."]
-allowed-tools: Bash(vibe:*), Bash(gh:*)
+allowed-tools: Bash(vibe:*), Bash(gh:*), AskUserQuestion
 ---
 
 # Update Pull Request
@@ -30,7 +30,19 @@ Update specific sections of an existing PR.
    gh pr view --json body
    ```
 
-2. **Update relevant sections**:
+2. **Determine what to update**:
+
+   If the user hasn't specified which sections to update, use AskUserQuestion to ask:
+
+   "Which PR sections would you like to update?"
+
+   Available sections:
+   - Summary
+   - Description
+   - Testing instructions
+   - Ticket reference
+
+3. **Update relevant sections**:
 
    ```bash
    vibe pr-update --summary "..." --description "..." --testing "..."

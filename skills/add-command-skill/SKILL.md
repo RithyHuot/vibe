@@ -22,14 +22,16 @@ Before starting, gather:
 
 ### 1. Gather Requirements
 
-Ask the user:
+Use AskUserQuestion to gather all necessary information:
 
-- What is the command name?
-- What does the command do?
-- What arguments/flags does it need?
-- When should the skill be invoked?
-- What output should it provide?
-- What additional information you would like to provide to generate this command?
+**Questions to ask:**
+
+1. **Command Name**: "What is the command name?" (e.g., "status", "deploy", "review")
+2. **Command Purpose**: "What does the command do?"
+3. **Arguments/Flags**: "What arguments or flags does the command need?"
+4. **Skill Trigger**: "When should the skill be invoked?" (e.g., user phrases that should trigger this)
+5. **Expected Output**: "What output should the command provide?"
+6. **Additional Context**: "What additional information would you like to provide to generate this command?"
 
 ### 2. Create Command File
 
