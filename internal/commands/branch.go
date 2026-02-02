@@ -54,7 +54,7 @@ func runBranch(ctx *CommandContext, ticketID string) error {
 	if ticketID != "" {
 		// Validate ticket ID format
 		if !utils.IsTicketID(ticketID) {
-			return fmt.Errorf("invalid ticket ID format: %s\n\nTicket ID must be exactly 9 alphanumeric characters (e.g., abc123xyz)", ticketID)
+			return fmt.Errorf("invalid ticket ID format: '%s'\n\nTicket ID must be exactly 9 alphanumeric characters (e.g., abc123xyz)", ticketID)
 		}
 
 		// Create branch name with ticket ID using GenerateBranchName
@@ -135,18 +135,15 @@ func createOrCheckoutBranch(ctx *CommandContext, branchName string) error {
 		return err
 	}
 
-	// Create and checkout new branch atomically
-	// Note: CreateBranch in the git service should create the branch reference
-	// but not switch to it. The Checkout call then switches to it.
-	// If Checkout fails, the branch reference exists but we're not on it,
-	// which is acceptable as users can manually switch to it later.
+	// Create branch reference and checkout
 	if err := ctx.GitRepo.CreateBranch(branchName); err != nil {
 		return fmt.Errorf("failed to create branch: %w", err)
 	}
 
 	if err := ctx.GitRepo.Checkout(branchName); err != nil {
-		// Branch was created but checkout failed - inform user
-		return fmt.Errorf("branch %s was created but checkout failed: %w\nYou can manually checkout with: git checkout %s", branchName, err, branchName)
+		// Branch was created but checkout failed - offer cleanup
+		_, _ = ui.Warning.Printf("Branch %s was created but checkout failed\n", branchName)
+		return fmt.Errorf("checkout failed: %w\nManual cleanup: git branch -d %s", err, branchName)
 	}
 
 	_, _ = ui.Success.Printf("✓ Created and checked out branch: %s\n", ui.Cyan.Sprint(branchName))

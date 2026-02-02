@@ -226,42 +226,57 @@ func handleBranchCreationForStart(ctx *CommandContext, branchName string) error 
 	}
 
 	if exists {
-		var action string
-		prompt := &survey.Select{
-			Message: fmt.Sprintf("Branch %s already exists.", ui.Cyan.Sprint(branchName)),
-			Options: []string{actionCheckItOut, actionDeleteRecreate, actionCancel},
-		}
-		if err := survey.AskOne(prompt, &action); err != nil {
-			return err
-		}
-
-		switch action {
-		case actionCancel:
-			return nil
-		case actionCheckItOut:
-			// Check for uncommitted changes before checkout
-			if err := handleUncommittedChanges(ctx); err != nil {
-				return err
-			}
-			if err := ctx.GitRepo.Checkout(branchName); err != nil {
-				return fmt.Errorf("failed to checkout branch: %w", err)
-			}
-			_, _ = ui.Success.Printf("✓ Checked out branch: %s\n", branchName)
-			return nil
-		case actionDeleteRecreate:
-			// Delete branch using git command (go-git doesn't support delete easily)
-			if err := deleteBranch(branchName); err != nil {
-				return fmt.Errorf("failed to delete branch: %w", err)
-			}
-		}
+		return handleExistingBranch(ctx, branchName)
 	}
 
-	// Check for uncommitted changes before checkout
+	return createAndCheckoutNewBranch(ctx, branchName)
+}
+
+// handleExistingBranch prompts user and handles checkout/recreate for existing branches
+func handleExistingBranch(ctx *CommandContext, branchName string) error {
+	var action string
+	prompt := &survey.Select{
+		Message: fmt.Sprintf("Branch %s already exists.", ui.Cyan.Sprint(branchName)),
+		Options: []string{actionCheckItOut, actionDeleteRecreate, actionCancel},
+	}
+	if err := survey.AskOne(prompt, &action); err != nil {
+		return err
+	}
+
+	switch action {
+	case actionCancel:
+		return nil
+	case actionCheckItOut:
+		return checkoutExistingBranch(ctx, branchName)
+	case actionDeleteRecreate:
+		// Delete branch and proceed to create new one
+		if err := deleteBranch(branchName); err != nil {
+			return fmt.Errorf("failed to delete branch: %w", err)
+		}
+		return createAndCheckoutNewBranch(ctx, branchName)
+	}
+
+	return nil
+}
+
+// checkoutExistingBranch handles checkout of an existing branch with uncommitted changes check
+func checkoutExistingBranch(ctx *CommandContext, branchName string) error {
+	if err := handleUncommittedChanges(ctx); err != nil {
+		return err
+	}
+	if err := ctx.GitRepo.Checkout(branchName); err != nil {
+		return fmt.Errorf("failed to checkout branch: %w", err)
+	}
+	_, _ = ui.Success.Printf("✓ Checked out branch: %s\n", branchName)
+	return nil
+}
+
+// createAndCheckoutNewBranch creates and checks out a new branch with uncommitted changes check
+func createAndCheckoutNewBranch(ctx *CommandContext, branchName string) error {
 	if err := handleUncommittedChanges(ctx); err != nil {
 		return err
 	}
 
-	// Create and checkout new branch
 	if err := ctx.GitRepo.CreateBranch(branchName); err != nil {
 		return fmt.Errorf("failed to create branch: %w", err)
 	}

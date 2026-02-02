@@ -17,6 +17,9 @@ var (
 
 	// shellMetacharPattern matches potentially dangerous shell metacharacters
 	shellMetacharPattern = regexp.MustCompile(`[;&|><$` + "`" + `(){}[\]\\]`)
+
+	// maxBranchPartLength is the maximum length for branch name parts
+	maxBranchPartLength = 50
 )
 
 // GenerateBranchName creates a branch name from components
@@ -47,13 +50,19 @@ func GenerateBranchName(prefix, ticketID, title string, username ...string) stri
 	// Trim hyphens from start and end
 	sanitized = strings.Trim(sanitized, "-")
 
-	// Limit length
-	if len(sanitized) > 50 {
-		sanitized = sanitized[:50]
-		sanitized = strings.TrimRight(sanitized, "-")
-	}
+	// Limit length and trim trailing hyphens
+	sanitized = limitLengthAndTrim(sanitized, maxBranchPartLength)
 
 	return fmt.Sprintf("%s/%s/%s", branchPrefix, ticketID, sanitized)
+}
+
+// limitLengthAndTrim limits a string to maxLen characters and trims trailing hyphens
+func limitLengthAndTrim(s string, maxLen int) string {
+	if len(s) > maxLen {
+		s = s[:maxLen]
+		s = strings.TrimRight(s, "-")
+	}
+	return s
 }
 
 // SanitizeUsername sanitizes a username for use in branch names
@@ -97,13 +106,8 @@ func SanitizeBranchPart(part string) string {
 	// Trim hyphens from start and end
 	s = strings.Trim(s, "-")
 
-	// Limit length
-	if len(s) > 50 {
-		s = s[:50]
-		s = strings.TrimRight(s, "-")
-	}
-
-	return s
+	// Limit length and trim trailing hyphens
+	return limitLengthAndTrim(s, maxBranchPartLength)
 }
 
 // GetGitUsername retrieves the git user.name from git config
@@ -111,7 +115,14 @@ func GetGitUsername() (string, error) {
 	cmd := exec.Command("git", "config", "user.name")
 	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("git config user.name not set")
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			stderr := strings.TrimSpace(string(exitErr.Stderr))
+			if stderr != "" {
+				return "", fmt.Errorf("git config user.name not set: %s", stderr)
+			}
+			return "", fmt.Errorf("git config user.name not set")
+		}
+		return "", fmt.Errorf("failed to run git config: %w", err)
 	}
 
 	username := strings.TrimSpace(string(output))
