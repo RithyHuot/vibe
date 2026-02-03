@@ -94,6 +94,7 @@ func Uninstall() error {
 	// List of vibe skill directories to remove
 	skillDirs := []string{
 		"vibe",
+		"vibe-workon",
 		"vibe-ticket",
 		"vibe-comment",
 		"vibe-pr",
@@ -109,6 +110,7 @@ func Uninstall() error {
 		"vibe-dependabot-review",
 		"add-claude-skill",
 		"add-command-skill",
+		"vibe-branch",
 	}
 
 	// Remove each skill directory
@@ -139,8 +141,10 @@ func PrintInstallSuccess() {
 	fmt.Println()
 	fmt.Println("Core Workflow:")
 	fmt.Println("  - vibe                    Start work on a ClickUp ticket")
+	fmt.Println("  - vibe-workon             Start work on a ClickUp ticket (explicit)")
 	fmt.Println("  - vibe-ticket             Get context on current ticket")
 	fmt.Println("  - vibe-comment            Add comment to ticket")
+	fmt.Println("  - vibe-branch             Create and checkout a new branch")
 	fmt.Println()
 	fmt.Println("Pull Requests:")
 	fmt.Println("  - vibe-pr                 Create a pull request")

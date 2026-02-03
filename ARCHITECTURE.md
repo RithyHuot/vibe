@@ -160,7 +160,7 @@ Note: CircleCI integration exists in commands but not in CommandContext
 5. **Cache check**: Result cached in `utils.Cache` with TTL
 6. **Branch generation**: `utils.GenerateBranchName()` creates branch name
 7. **Git operation**: `GitRepo.CreateBranch()` creates branch
-8. **Status update**: `ClickUpClient.UpdateTask()` sets status to "In Progress"
+8. **Status update**: `ClickUpClient.UpdateTask()` sets status (configured in `defaults.status`)
 9. **Output**: Formatted success message displayed to user
 
 ## Design Patterns

@@ -29,7 +29,7 @@ Claude Code skills are AI-powered integrations that allow Claude Code to interac
 
 - Creates or checks out a branch for the ticket
 - Automatically fetches ticket context
-- Updates task status to "In Progress"
+- Updates task status (configured in defaults.status)
 - Prompts to stash uncommitted changes if present
 
 **Example usage**:
@@ -43,7 +43,31 @@ Claude: Runs `vibe 86b7x5453`, then `vibe ticket` to get context
 
 ---
 
-### 2. vibe-ticket
+### 2. vibe-workon
+
+**Purpose**: Start work on a ClickUp ticket (explicit command)
+
+**When to use**: User says "vibe workon" or wants to work on a specific ticket using the explicit workon command (e.g., "vibe workon abc123")
+
+**What it does**:
+
+- Creates or checks out a branch for the ticket
+- Automatically fetches ticket context
+- Updates task status (configured in defaults.status)
+- Prompts to stash uncommitted changes if present
+
+**Example usage**:
+
+```
+User: "vibe workon 86b7x5453"
+Claude: Runs `vibe workon 86b7x5453`, then `vibe ticket` to get context
+```
+
+**Note**: This is functionally identical to the `vibe` command but uses the explicit `vibe workon` syntax. Both commands do the same thing.
+
+---
+
+### 3. vibe-ticket
 
 **Purpose**: Get context on the current ClickUp ticket
 
@@ -68,7 +92,7 @@ Claude: Runs `vibe ticket` and summarizes the requirements
 
 ---
 
-### 3. vibe-comment
+### 4. vibe-comment
 
 **Purpose**: Add a comment to the current ClickUp ticket
 
@@ -88,7 +112,7 @@ Claude: Runs `vibe comment "Fixed the bug"`
 
 ---
 
-### 4. vibe-pr
+### 5. vibe-pr
 
 **Purpose**: Create a pull request
 
@@ -122,7 +146,7 @@ Claude:
 
 ---
 
-### 5. vibe-pr-status
+### 6. vibe-pr-status
 
 **Purpose**: Check pull request status
 
@@ -143,7 +167,7 @@ Claude: Runs `vibe pr-status` and reports the status
 
 ---
 
-### 6. vibe-pr-update
+### 7. vibe-pr-update
 
 **Purpose**: Update sections of an existing pull request
 
@@ -165,7 +189,7 @@ Claude:
 
 ---
 
-### 7. vibe-merge
+### 8. vibe-merge
 
 **Purpose**: Merge a pull request
 
@@ -191,7 +215,7 @@ Claude:
 
 ---
 
-### 8. vibe-ci-status
+### 9. vibe-ci-status
 
 **Purpose**: Check CircleCI status and help fix failures
 
@@ -216,7 +240,7 @@ Claude:
 
 ---
 
-### 9. vibe-issues
+### 11. vibe-issues
 
 **Purpose**: List and browse GitHub issues
 
@@ -237,7 +261,7 @@ Claude: Runs `vibe issues` and shows the list
 
 ---
 
-### 10. vibe-issue
+### 11. vibe-issue
 
 **Purpose**: View GitHub issue details
 
@@ -258,7 +282,7 @@ Claude: Runs `vibe issue 123 --comments` and displays details
 
 ---
 
-### 11. vibe-issue-create
+### 12. vibe-issue-create
 
 **Purpose**: Create a new GitHub issue
 
@@ -282,7 +306,7 @@ Claude:
 
 ---
 
-### 12. vibe-issue-update
+### 13. vibe-issue-update
 
 **Purpose**: Update an existing GitHub issue
 
@@ -303,7 +327,7 @@ Claude: Runs `vibe issue-update 123 --state closed`
 
 ---
 
-### 13. vibe-code-review
+### 14. vibe-code-review
 
 **Purpose**: Perform comprehensive code review
 
@@ -338,7 +362,7 @@ Claude:
 
 ---
 
-### 14. vibe-dependabot-review
+### 15. vibe-dependabot-review
 
 **Purpose**: Review Dependabot PRs for breaking changes and create fixes
 
@@ -402,7 +426,7 @@ Claude:
 
 ---
 
-### 15. add-claude-skill
+### 16. add-claude-skill
 
 **Purpose**: Add a new Claude Code skill for vibe CLI
 
@@ -450,7 +474,7 @@ Claude:
 
 ---
 
-### 16. add-command-skill
+### 17. add-command-skill
 
 **Purpose**: Add a new vibe command with associated Claude Code skill
 

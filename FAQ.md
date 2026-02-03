@@ -222,6 +222,46 @@ This happens when you're not on a ticket branch. Solutions:
 
 4. **View ticket without branch**: `vibe ticket TICKET_ID`
 
+### Getting "Status does not exist" error when running vibe workon
+
+When running `vibe workon <ticket-id>`, you might see:
+
+```
+Failed to update task status: HTTP 400: Status does not exist
+```
+
+**Why this happens:**
+
+The status name in your config doesn't exist in your ClickUp space. Status names vary by space/list and must be valid status names configured in ClickUp.
+
+**Solutions:**
+
+1. **Find a valid status name:**
+   - Open any ticket in ClickUp
+   - Note the available status names (e.g., "doing", "on deck", "in code review")
+   - Update `~/.config/vibe/config.yaml`:
+
+   ```yaml
+   defaults:
+     status: "on deck"  # Use a valid status name from your ClickUp space
+   ```
+
+2. **Common ClickUp statuses:**
+   - `"prioritized"` (prioritized)
+   - `"on deck"` (ready to start)
+   - `"doing"` (active)
+   - `"backlog"` (backlog)
+   - `"complete"` (completed)
+
+3. **Disable automatic status updates** (optional):
+
+   ```yaml
+   defaults:
+     # status: "in progress"  # Commented out
+   ```
+
+**Note:** The command still works even if status update fails - it successfully creates/checks out your branch. The status update is a convenience feature.
+
 ### My PR description is not formatted correctly
 
 Common issues:
@@ -420,6 +460,7 @@ git stash apply  # Apply but keep in stash
 If stashing fails, you'll see an error message with details. Common causes:
 
 1. **Merge conflicts in working directory**
+
    ```bash
    # Resolve conflicts first, then try again
    git status  # Check conflicted files
@@ -428,6 +469,7 @@ If stashing fails, you'll see an error message with details. Common causes:
    ```
 
 2. **Permission issues**
+
    ```bash
    # Check file permissions
    ls -la
@@ -435,6 +477,7 @@ If stashing fails, you'll see an error message with details. Common causes:
    ```
 
 3. **Corrupted git repository**
+
    ```bash
    # Verify repository integrity
    git fsck
@@ -543,7 +586,7 @@ vibe pr-update --body "Updated implementation based on feedback"
 1. **With ticket ID**: `vibe start TICKET_ID` - Works like `vibe workon TICKET_ID`
 2. **Without ticket ID**: Prompts you to enter a ticket ID or search term
 3. Creates/switches to the ticket branch
-4. Updates ticket status to "In Progress"
+4. Updates ticket status (configured in `defaults.status`)
 
 **Note:** The search functionality is not yet fully implemented. Currently, you need to enter the ticket ID directly when prompted.
 

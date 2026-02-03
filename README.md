@@ -259,6 +259,7 @@ This removes all vibe skills from `~/.claude/skills/`. You can reinstall them an
 | Skill | Description | Usage |
 |-------|-------------|-------|
 | `vibe` | Start work on a ClickUp ticket | "vibe 86b7x5453" |
+| `vibe-workon` | Start work on a ClickUp ticket (explicit) | "vibe workon 86b7x5453" |
 | `vibe-branch` | Create and checkout a new branch | "create a branch" or "vibe branch abc123xyz" |
 | `vibe-ticket` | Get context on current ticket | "what am I working on?" |
 | `vibe-comment` | Add comment to ticket | "vibe comment <text>" |
@@ -357,7 +358,10 @@ workspaces:
 
 # Default Settings (OPTIONAL - sensible defaults provided)
 defaults:
-  status: "In Progress"             # OPTIONAL: Status to set when starting work (default: "In Progress")
+  status: "doing"             # OPTIONAL: Status to set when starting work
+                                    # Must be a valid status name in your ClickUp space
+                                    # Common values: "doing", "on deck", "backlog"
+                                    # Comment out to disable automatic status updates
 ```
 
 #### Environment Variables (Alternative to config file)
@@ -451,7 +455,7 @@ vibe abc123xyz
 # 1. Fetch the task from ClickUp
 # 2. Create a branch: username/abc123xyz/task-name
 # 3. Checkout the branch
-# 4. Update task status to "In Progress"
+# 4. Update task status (configured in defaults.status)
 ```
 
 ## Commands
@@ -942,7 +946,7 @@ workspaces:
       - "Sprint \\d+ \\("
 
 defaults:
-  status: "In Progress"
+  status: "in progress"  # Must be a valid status in your ClickUp space
 
 ai:
   enabled: true
@@ -1187,7 +1191,7 @@ vibe <command>
 # 1. Start working on a ticket
 vibe abc123xyz
 # Creates branch: username/abc123xyz/feature-name
-# Updates ticket status to "In Progress"
+# Updates ticket status (per config)
 
 # 2. Make your changes
 # ... code, commit, etc ...
@@ -1310,6 +1314,8 @@ vibe/
 │   └── utils/            # Utilities
 ├── skills/               # Claude Code integration skills
 │   ├── vibe/
+│   ├── vibe-workon/
+│   ├── vibe-branch/
 │   ├── vibe-ticket/
 │   ├── vibe-comment/
 │   ├── vibe-pr/
@@ -1322,7 +1328,9 @@ vibe/
 │   ├── vibe-issue-create/
 │   ├── vibe-issue-update/
 │   ├── vibe-code-review/
-│   └── vibe-dependabot-review/
+│   ├── vibe-dependabot-review/
+│   ├── add-claude-skill/
+│   └── add-command-skill/
 ├── Makefile
 └── README.md
 ```
