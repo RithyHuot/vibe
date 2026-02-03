@@ -180,6 +180,27 @@ Examples:
 		},
 	}
 
+	// Workon command
+	workonCmd := &cobra.Command{
+		Use:   "workon <ticket-id>",
+		Short: "Start working on a ticket",
+		Long: `Fetches a task from ClickUp, creates a branch, and updates the task status.
+
+Examples:
+  vibe workon abc123             # Start working on ticket abc123
+  vibe workon 86b7x5453          # Start working with full ClickUp ID
+  vibe abc123                    # Shorthand: vibe command works the same`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(_ *cobra.Command, args []string) error {
+			ctx, err := getContext()
+			if err != nil {
+				return err
+			}
+			vibeActual := commands.NewVibeCommand(ctx)
+			return vibeActual.RunE(nil, args)
+		},
+	}
+
 	// Comment command
 	commentCmd := &cobra.Command{
 		Use:   "comment <text>",
@@ -377,5 +398,5 @@ Examples:
 		return cmd.Help()
 	}
 
-	rootCmd.AddCommand(ticketCmd, commentCmd, prCmd, prStatusCmd, prUpdateCmd, startCmd, mergeCmd, ciStatusCmd, ciFailureCmd, issuesCmd, issueCmd, issueCreateCmd, issueUpdateCmd, branchCmd)
+	rootCmd.AddCommand(workonCmd, ticketCmd, commentCmd, prCmd, prStatusCmd, prUpdateCmd, startCmd, mergeCmd, ciStatusCmd, ciFailureCmd, issuesCmd, issueCmd, issueCreateCmd, issueUpdateCmd, branchCmd)
 }

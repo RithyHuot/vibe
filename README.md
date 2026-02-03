@@ -259,6 +259,7 @@ This removes all vibe skills from `~/.claude/skills/`. You can reinstall them an
 | Skill | Description | Usage |
 |-------|-------------|-------|
 | `vibe` | Start work on a ClickUp ticket | "vibe 86b7x5453" |
+| `vibe-workon` | Start work on a ClickUp ticket (explicit) | "vibe workon 86b7x5453" |
 | `vibe-branch` | Create and checkout a new branch | "create a branch" or "vibe branch abc123xyz" |
 | `vibe-ticket` | Get context on current ticket | "what am I working on?" |
 | `vibe-comment` | Add comment to ticket | "vibe comment <text>" |
@@ -1310,6 +1311,8 @@ vibe/
 │   └── utils/            # Utilities
 ├── skills/               # Claude Code integration skills
 │   ├── vibe/
+│   ├── vibe-workon/
+│   ├── vibe-branch/
 │   ├── vibe-ticket/
 │   ├── vibe-comment/
 │   ├── vibe-pr/
@@ -1322,7 +1325,9 @@ vibe/
 │   ├── vibe-issue-create/
 │   ├── vibe-issue-update/
 │   ├── vibe-code-review/
-│   └── vibe-dependabot-review/
+│   ├── vibe-dependabot-review/
+│   ├── add-claude-skill/
+│   └── add-command-skill/
 ├── Makefile
 └── README.md
 ```
