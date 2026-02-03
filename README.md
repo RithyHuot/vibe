@@ -358,7 +358,10 @@ workspaces:
 
 # Default Settings (OPTIONAL - sensible defaults provided)
 defaults:
-  status: "In Progress"             # OPTIONAL: Status to set when starting work (default: "In Progress")
+  status: "doing"             # OPTIONAL: Status to set when starting work
+                                    # Must be a valid status name in your ClickUp space
+                                    # Common values: "doing", "on deck", "backlog"
+                                    # Comment out to disable automatic status updates
 ```
 
 #### Environment Variables (Alternative to config file)
@@ -452,7 +455,7 @@ vibe abc123xyz
 # 1. Fetch the task from ClickUp
 # 2. Create a branch: username/abc123xyz/task-name
 # 3. Checkout the branch
-# 4. Update task status to "In Progress"
+# 4. Update task status (configured in defaults.status)
 ```
 
 ## Commands
@@ -943,7 +946,7 @@ workspaces:
       - "Sprint \\d+ \\("
 
 defaults:
-  status: "In Progress"
+  status: "in progress"  # Must be a valid status in your ClickUp space
 
 ai:
   enabled: true
@@ -1188,7 +1191,7 @@ vibe <command>
 # 1. Start working on a ticket
 vibe abc123xyz
 # Creates branch: username/abc123xyz/feature-name
-# Updates ticket status to "In Progress"
+# Updates ticket status (per config)
 
 # 2. Make your changes
 # ... code, commit, etc ...

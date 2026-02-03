@@ -29,7 +29,7 @@ Claude Code skills are AI-powered integrations that allow Claude Code to interac
 
 - Creates or checks out a branch for the ticket
 - Automatically fetches ticket context
-- Updates task status to "In Progress"
+- Updates task status (configured in defaults.status)
 - Prompts to stash uncommitted changes if present
 
 **Example usage**:
@@ -53,7 +53,7 @@ Claude: Runs `vibe 86b7x5453`, then `vibe ticket` to get context
 
 - Creates or checks out a branch for the ticket
 - Automatically fetches ticket context
-- Updates task status to "In Progress"
+- Updates task status (configured in defaults.status)
 - Prompts to stash uncommitted changes if present
 
 **Example usage**:

@@ -30,7 +30,7 @@ git:
 
 # 5. Override defaults:
 # defaults:
-#   status: "Ready for Review"
+#   status: "Doing" # Update this with the exact status name from your ClickUp space
 
 # 6. Disable AI features for this project:
 # ai:

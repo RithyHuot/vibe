@@ -54,7 +54,12 @@ workspaces:
 
 # Default values
 defaults:
-  status: "In Progress"
+  # Status to automatically set when starting work on a ticket
+  # Must be a valid status name that exists in your ClickUp space
+  # Common values: "doing", "on deck", "backlog", "prioritized", "in code review"
+  # To find: Check any ticket in ClickUp to see available status names
+  # Comment out this line to disable automatic status updates
+  status: "doing"
 
 # AI features
 ai:
