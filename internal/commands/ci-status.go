@@ -9,8 +9,9 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/rithyhuot/vibe/internal/services/circleci"
 	"github.com/spf13/cobra"
+
+	"github.com/rithyhuot/vibe/internal/services/circleci"
 )
 
 // NewCIStatusCommand creates the ci-status command

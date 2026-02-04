@@ -6,10 +6,11 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
+	"github.com/spf13/cobra"
+
 	"github.com/rithyhuot/vibe/internal/ui"
 	"github.com/rithyhuot/vibe/internal/utils"
-	"github.com/spf13/cobra"
 )
 
 // NewStartCommand creates the start command

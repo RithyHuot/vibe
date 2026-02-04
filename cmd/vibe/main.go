@@ -7,10 +7,11 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	vibe "github.com/rithyhuot/vibe"
 	"github.com/rithyhuot/vibe/internal/commands"
 	"github.com/rithyhuot/vibe/internal/config"
-	"github.com/spf13/cobra"
 )
 
 // commandContextKey is defined in the commands package to ensure type consistency

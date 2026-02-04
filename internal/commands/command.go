@@ -7,22 +7,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
+	"github.com/spf13/cobra"
+
 	"github.com/rithyhuot/vibe/internal/config"
 	"github.com/rithyhuot/vibe/internal/services/claude"
 	"github.com/rithyhuot/vibe/internal/services/clickup"
 	"github.com/rithyhuot/vibe/internal/services/git"
 	"github.com/rithyhuot/vibe/internal/services/github"
 	"github.com/rithyhuot/vibe/internal/ui"
-	"github.com/spf13/cobra"
 )
 
 const (
 	// User action constants for prompts
-	actionStashChanges    = "Stash changes"
-	actionCheckItOut      = "Check it out"
-	actionDeleteRecreate  = "Delete and recreate"
-	actionCancel          = "Cancel"
+	actionStashChanges   = "Stash changes"
+	actionCheckItOut     = "Check it out"
+	actionDeleteRecreate = "Delete and recreate"
+	actionCancel         = "Cancel"
 
 	// gitStashTimeout is the maximum time to wait for git stash operation
 	// 30s should be sufficient for most repos; very large repos may need adjustment

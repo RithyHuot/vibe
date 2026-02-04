@@ -6,12 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	"github.com/rithyhuot/vibe/internal/models"
 	"github.com/rithyhuot/vibe/internal/services/github"
-	"github.com/spf13/cobra"
 )
 
 const (

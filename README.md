@@ -1288,6 +1288,39 @@ make test
 make lint
 ```
 
+### Format
+
+```bash
+make fmt
+```
+
+### Security Scan
+
+```bash
+make vulncheck
+
+# Control output options (traces, color, version, verbose)
+VULNCHECK_SHOW=color make vulncheck
+```
+
+### Run All Checks
+
+```bash
+make check
+```
+
+### Pre-PR Checks
+
+```bash
+make pre-pr
+```
+
+### View All Available Commands
+
+```bash
+make help
+```
+
 ### Install Locally
 
 ```bash

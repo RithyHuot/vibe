@@ -23,7 +23,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.25.6'
           cache: true
 
       - name: Run golangci-lint
@@ -31,3 +31,37 @@ jobs:
         with:
           version: v2.8.0
           args: --timeout=5m
+
+  format-check:
+    name: format-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.6'
+          cache: true
+
+      - name: Check import formatting
+        run: |
+          make fmt
+          git diff --exit-code || (echo "Import formatting issues detected. Run 'make fmt' locally." && exit 1)
+
+  vulnerability-scan:
+    name: vulnerability-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.6'
+          cache: true
+
+      - name: Run govulncheck
+        run: make vulncheck

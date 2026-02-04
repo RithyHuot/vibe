@@ -127,7 +127,8 @@ test: add unit tests for branch utilities
 ### General Guidelines
 
 - Follow standard Go conventions and idioms
-- Use `gofmt` to format your code (automatically done by `make fmt`)
+- Use `gofmt` to format your code
+- Use `goimports-reviser` to organize imports (run `make fmt`)
 - Use `golangci-lint` for linting (run `make lint`)
 - Keep functions small and focused
 - Use meaningful variable and function names
@@ -459,6 +460,30 @@ When reviewing PRs or self-reviewing before submission:
 - [ ] Branch name follows convention
 - [ ] No merge commits (rebase preferred)
 
+### Pre-commit Checks
+
+Before submitting a PR, run all checks:
+
+```bash
+# Run all pre-PR checks at once (recommended)
+make pre-pr
+
+# Or use the check command (does the same thing)
+make check
+
+# Or run individually
+make lint       # Code quality checks
+make fmt        # Format imports
+make test       # Run tests
+make vulncheck  # Security vulnerability scan
+```
+
+**Required for CI**:
+- All linting rules must pass
+- Code must be properly formatted (imports organized)
+- All tests must pass
+- No known vulnerabilities in dependencies
+
 ## Submitting Changes
 
 ### Pull Request Process
@@ -578,12 +603,23 @@ Any other relevant information, mockups, examples, etc.
 ### Useful Make Commands
 
 ```bash
+make help       # Show all available make commands
 make build      # Build the binary
 make test       # Run tests
-make lint       # Run linter
-make fmt        # Format code
+make lint       # Run golangci-lint
+make fmt        # Format imports with goimports-reviser
+make vulncheck  # Scan for security vulnerabilities
+make pre-pr     # Run all pre-PR checks (recommended before creating PR)
+make check      # Run all checks (same as pre-pr)
 make install    # Install to $GOPATH/bin
 make clean      # Clean build artifacts
+```
+
+**Tip**: Control vulnerability scan output:
+```bash
+make vulncheck                           # Default: verbose output
+VULNCHECK_SHOW=color make vulncheck      # Colorized output only
+VULNCHECK_SHOW=traces,verbose make vulncheck  # Show traces and verbose details
 ```
 
 ### Debugging
