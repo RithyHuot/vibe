@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"github.com/rithyhuot/vibe/internal/utils"
 	"github.com/spf13/cobra"
+
+	"github.com/rithyhuot/vibe/internal/utils"
 )
 
 // NewTicketCommand creates the ticket command

@@ -8,8 +8,9 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/rithyhuot/vibe/internal/utils"
 	"github.com/spf13/cobra"
+
+	"github.com/rithyhuot/vibe/internal/utils"
 )
 
 // PRUpdateOptions holds flags for the pr-update command

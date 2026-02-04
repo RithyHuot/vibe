@@ -8,6 +8,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
+
 	"github.com/rithyhuot/vibe/internal/services/github"
 	"github.com/rithyhuot/vibe/internal/utils"
 )

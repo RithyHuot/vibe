@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	"github.com/rithyhuot/vibe/internal/config"
 	"github.com/rithyhuot/vibe/internal/skills"
-	"github.com/spf13/cobra"
 )
 
 // NewInitCommand creates the init command

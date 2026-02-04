@@ -8,9 +8,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/rithyhuot/vibe/internal/ui"
 	"github.com/rithyhuot/vibe/internal/utils"
-	"github.com/spf13/cobra"
 )
 
 // NewCommentCommand creates the comment command

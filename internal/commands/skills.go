@@ -5,8 +5,9 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/rithyhuot/vibe/internal/skills"
 	"github.com/spf13/cobra"
+
+	"github.com/rithyhuot/vibe/internal/skills"
 )
 
 // NewSkillsCommand creates the skills command
